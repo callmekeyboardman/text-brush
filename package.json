@@ -1,0 +1,27 @@
+{
+  "name": "obsidian-text-format",
+  "version": "1.0.0",
+  "description": "Right-click selected text in the editor to apply color, font size, or bold from a configurable palette.",
+  "main": "main.js",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+    "typecheck": "tsc -noEmit -skipLibCheck"
+  },
+  "keywords": [
+    "obsidian",
+    "obsidian-plugin",
+    "text-format",
+    "highlight",
+    "context-menu"
+  ],
+  "author": "shimengjie",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "esbuild": "^0.17.0",
+    "obsidian": "^1.4.0",
+    "tslib": "^2.6.0",
+    "typescript": "^5.0.0"
+  }
+}

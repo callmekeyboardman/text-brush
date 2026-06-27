@@ -1,0 +1,10 @@
+{
+  "id": "text-formatter",
+  "name": "Text Format",
+  "version": "1.0.0",
+  "minAppVersion": "0.15.0",
+  "description": "Right-click selected text in the editor to apply color, font size, or bold from a configurable palette.",
+  "author": "shimengjie",
+  "authorUrl": "https://github.com/callmekeyboardman",
+  "isDesktopOnly": false
+}

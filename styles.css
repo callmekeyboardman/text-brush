@@ -1,0 +1,33 @@
+/* Obsidian Text Color plugin
+ * The wrapping <span> emits both an inline style (so exported HTML keeps
+ * the color) and these classes (so themes / CSS Snippets can override).
+ *
+ * If you want a class to win over the inline style, mark its `color` rule
+ * with `!important` here, e.g.:
+ *   .tc-color--red { color: var(--my-red) !important; }
+ */
+
+.tc-color {
+    /* placeholder, real color comes from the modifier class or inline style */
+}
+
+.tc-color--red    { color: var(--color-red); }
+.tc-color--orange { color: var(--color-orange); }
+.tc-color--yellow { color: var(--color-yellow); }
+.tc-color--green  { color: var(--color-green); }
+.tc-color--cyan   { color: var(--color-cyan); }
+.tc-color--blue   { color: var(--color-blue); }
+.tc-color--purple { color: var(--color-purple); }
+.tc-color--pink   { color: var(--color-pink); }
+.tc-color--gray   { color: #95a5a6; }
+
+/* Color preview swatch shown in menus and the settings tab */
+.tc-menu-swatch {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 8px;
+    border-radius: 3px;
+    vertical-align: middle;
+    border: 1px solid var(--background-modifier-border);
+}
