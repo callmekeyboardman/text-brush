@@ -146,7 +146,7 @@ this.registerEvent(
 
 ### loadSettings()
 
-1. 从 Obsidian 的 `loadData()` 读取 `data.json` 文件（文件位置默认是 `.obsidian/plugins/text-styler/data.json`）
+1. 从 Obsidian 的 `loadData()` 读取 `data.json` 文件（文件位置默认是 `.obsidian/plugins/text-brush/data.json`）
 2. 用读取出来的结果，覆盖插件的默认设置的 DEFAULT_SETTINGS，作为 `settings` 的值
 3. 若 `data.json` 内容为空，`settings` 使用默认设置的深拷贝
 

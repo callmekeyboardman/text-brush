@@ -1,4 +1,4 @@
-# Obsidian Text Format
+# Obsidian text-brush
 
 一个 Obsidian 插件，通过右键菜单为选中文字快速添加、切换或清除颜色和字体大小。
 
@@ -79,12 +79,12 @@
 ### 手动安装
 
 1. 下载或构建 `main.js`、`manifest.json`、`styles.css` 三个文件
-2. 将它们复制到 `<你的仓库>/.obsidian/plugins/text-styler/` 目录下
-3. 重启 Obsidian，进入 **设置 → 第三方插件**，启用 **Text Format**
+2. 将它们复制到 `<你的仓库>/.obsidian/plugins/text-brush/` 目录下
+3. 重启 Obsidian，进入 **设置 → 第三方插件**，启用 **text-brush**
 
 ## 设置
 
-进入 **设置 → Text Format**，可以：
+进入 **设置 → text-brush**，可以：
 
 ### 颜色设置
 - 修改每个颜色的显示名称和 CSS 值

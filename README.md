@@ -1,4 +1,4 @@
-# Obsidian Text Format
+# Obsidian text-brush
 
 [中文文档|Chinese](README_zh.md)
 
@@ -81,18 +81,18 @@ Applying only 16px font size to plain text:
 ### From Community Plugins
 
 1. Open **Settings → Community plugins → Browse**
-2. Search for **Text Format**
+2. Search for **text-brush**
 3. Click **Install**, then **Enable**
 
 ### Manual Installation
 
 1. Download or build `main.js`, `manifest.json`, and `styles.css`
-2. Copy them to `<your-vault>/.obsidian/plugins/text-styler/`
-3. Restart Obsidian, go to **Settings → Community plugins**, and enable **Text Format**
+2. Copy them to `<your-vault>/.obsidian/plugins/text-brush/`
+3. Restart Obsidian, go to **Settings → Community plugins**, and enable **text-brush**
 
 ## Settings
 
-Go to **Settings → Text Format** to:
+Go to **Settings → text-brush** to:
 
 ### Color Settings
 - Edit the display name and CSS value for each color

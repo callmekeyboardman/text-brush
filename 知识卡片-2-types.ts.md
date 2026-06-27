@@ -64,7 +64,7 @@ interface TextColorSettings {
 }
 ```
 
-插件的持久化数据结构，存储在 vault 的 `.obsidian/plugins/text-styler/data.json` 中。
+插件的持久化数据结构，存储在 vault 的 `.obsidian/plugins/text-brush/data.json` 中。
 
 ### ResolvedTarget
 

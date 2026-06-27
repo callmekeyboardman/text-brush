@@ -1,5 +1,5 @@
 {
-  "name": "obsidian-text-styler",
+  "name": "obsidian-text-brush",
   "version": "1.0.0",
   "description": "Right-click selected text in the editor to apply color, font size, or bold from a configurable palette.",
   "main": "main.js",
@@ -11,7 +11,7 @@
   "keywords": [
     "obsidian",
     "obsidian-plugin",
-    "text-styler",
+    "text-brush",
     "highlight",
     "context-menu"
   ],
