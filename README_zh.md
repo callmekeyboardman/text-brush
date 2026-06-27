@@ -79,7 +79,7 @@
 ### 手动安装
 
 1. 下载或构建 `main.js`、`manifest.json`、`styles.css` 三个文件
-2. 将它们复制到 `<你的仓库>/.obsidian/plugins/text-format/` 目录下
+2. 将它们复制到 `<你的仓库>/.obsidian/plugins/text-styler/` 目录下
 3. 重启 Obsidian，进入 **设置 → 第三方插件**，启用 **Text Format**
 
 ## 设置

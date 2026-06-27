@@ -87,7 +87,7 @@ Applying only 16px font size to plain text:
 ### Manual Installation
 
 1. Download or build `main.js`, `manifest.json`, and `styles.css`
-2. Copy them to `<your-vault>/.obsidian/plugins/text-format/`
+2. Copy them to `<your-vault>/.obsidian/plugins/text-styler/`
 3. Restart Obsidian, go to **Settings → Community plugins**, and enable **Text Format**
 
 ## Settings
