@@ -81,7 +81,7 @@ export default class TextColorPlugin extends Plugin {
             const probe = new Menu();
             let supported = false;
             probe.addItem((item) => {
-                supported = typeof (item as MenuItem).setSubmenu === 'function';
+                supported = typeof item.setSubmenu === 'function';
             });
             return supported;
         } catch {

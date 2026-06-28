@@ -153,11 +153,11 @@ export function removeFontSizeFromStyle(spanHtml: string): string {
 }
 
 export function createColorTitle(color: ColorOption): DocumentFragment {
-    const frag = document.createDocumentFragment();
-    const swatch = document.createElement('span');
+    const frag = activeDocument.createDocumentFragment();
+    const swatch = activeDocument.createElement('span');
     swatch.className = 'tc-menu-swatch';
     swatch.style.backgroundColor = color.value;
     frag.appendChild(swatch);
-    frag.appendChild(document.createTextNode(color.name));
+    frag.appendChild(activeDocument.createTextNode(color.name));
     return frag;
 }

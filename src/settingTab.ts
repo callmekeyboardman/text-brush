@@ -1,6 +1,5 @@
 import { App, Setting, PluginSettingTab } from 'obsidian';
 import type TextColorPlugin from './main';
-import { DEFAULT_COLORS, DEFAULT_FONT_SIZES } from './types';
 
 export class TextColorSettingTab extends PluginSettingTab {
     plugin: TextColorPlugin;
@@ -14,11 +13,10 @@ export class TextColorSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        containerEl.createEl('h2', { text: '文字颜色' });
-        containerEl.createEl('p', {
-            text: '配置右键菜单中可选的颜色。值可以是 CSS 颜色(如 #ff0000)或 var(--…) 引用主题变量。',
-            cls: 'setting-item-description',
-        });
+        new Setting(containerEl).setName('文字颜色').setHeading();
+        new Setting(containerEl).setDesc(
+            '配置右键菜单中可选的颜色。值可以是 CSS 颜色(如 #ff0000)或 var(--…) 引用主题变量。',
+        );
 
         this.plugin.settings.colors.forEach((color, idx) => {
             const setting = new Setting(containerEl);
@@ -85,11 +83,10 @@ export class TextColorSettingTab extends PluginSettingTab {
                     }),
             );
 
-        containerEl.createEl('h2', { text: '文字大小' });
-        containerEl.createEl('p', {
-            text: '配置右键菜单中可选的字号。值可以是任意 CSS 大小（如 14px、1.2em）。',
-            cls: 'setting-item-description',
-        });
+        new Setting(containerEl).setName('文字大小').setHeading();
+        new Setting(containerEl).setDesc(
+            '配置右键菜单中可选的字号。值可以是任意 CSS 大小（如 14px、1.2em）。',
+        );
 
         this.plugin.settings.fontSizes.forEach((size, idx) => {
             const setting = new Setting(containerEl);
