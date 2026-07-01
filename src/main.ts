@@ -4,8 +4,10 @@ import { Editor, Menu, MenuItem, Plugin } from 'obsidian';
 import { TextColorSettingTab } from './settingTab';
 
 import type { ColorOption, TextColorSettings, ResolvedTarget, FontSizeOption } from './types';
+import type { Translations } from './i18n';
+import { getTranslations } from './i18n';
 import {
-    DEFAULT_COLORS,
+    getDefaultColors,
     DEFAULT_FONT_SIZES,
     DEFAULT_SETTINGS,
     OPEN_TAG_RE,
@@ -37,6 +39,11 @@ export default class TextColorPlugin extends Plugin {
     settings!: TextColorSettings;
     private submenuSupported = false;
 
+    /** Active translation table, based on the language setting. */
+    get t(): Translations {
+        return getTranslations(this.settings.language);
+    }
+
     async onload() {
         await this.loadSettings();
         this.submenuSupported = this.detectSubmenuSupport();
@@ -56,10 +63,14 @@ export default class TextColorPlugin extends Plugin {
             ...DEFAULT_SETTINGS,
             ...(raw ?? {}),
         };
-        if (!Array.isArray(this.settings.colors) || this.settings.colors.length === 0) {
-            this.settings.colors = DEFAULT_COLORS.map((c) => ({ ...c }));
+        // When the user hasn't saved their own palette, build the defaults in the
+        // active language so a fresh install matches the resolved (e.g. auto) locale.
+        const savedColors = raw?.colors;
+        const savedFontSizes = raw?.fontSizes;
+        if (!Array.isArray(savedColors) || savedColors.length === 0) {
+            this.settings.colors = getDefaultColors(this.t);
         }
-        if (!Array.isArray(this.settings.fontSizes) || this.settings.fontSizes.length === 0) {
+        if (!Array.isArray(savedFontSizes) || savedFontSizes.length === 0) {
             this.settings.fontSizes = DEFAULT_FONT_SIZES.map((s) => ({ ...s }));
         }
     }
@@ -69,7 +80,7 @@ export default class TextColorPlugin extends Plugin {
     }
 
     resetColors() {
-        this.settings.colors = DEFAULT_COLORS.map((c) => ({ ...c }));
+        this.settings.colors = getDefaultColors(this.t);
     }
 
     resetFontSizes() {
@@ -93,15 +104,17 @@ export default class TextColorPlugin extends Plugin {
         const target = this.resolveTarget(editor);
         if (!target) return;
 
+        const t = this.t;
+
         if (this.submenuSupported) {
             menu.addItem((item) => {
-                item.setTitle('文字颜色');
+                item.setTitle(t.menuTextColor);
                 item.setIcon('palette');
                 const submenu = item.setSubmenu!();
                 this.populateColorMenu(submenu, editor, target);
             });
             menu.addItem((item) => {
-                item.setTitle('文字大小');
+                item.setTitle(t.menuTextSize);
                 item.setIcon('type');
                 const submenu = item.setSubmenu!();
                 this.populateFontSizeMenu(submenu, editor, target);
@@ -109,14 +122,14 @@ export default class TextColorPlugin extends Plugin {
         } else {
             menu.addSeparator();
             menu.addItem((item) => {
-                item.setTitle('— 文字颜色 —');
+                item.setTitle(`— ${t.menuTextColor} —`);
                 item.setIcon('palette');
                 item.setDisabled(true);
             });
             this.populateColorMenu(menu, editor, target);
             menu.addSeparator();
             menu.addItem((item) => {
-                item.setTitle('— 文字大小 —');
+                item.setTitle(`— ${t.menuTextSize} —`);
                 item.setIcon('type');
                 item.setDisabled(true);
             });
@@ -184,7 +197,7 @@ export default class TextColorPlugin extends Plugin {
         }
         menu.addSeparator();
         menu.addItem((sub) => {
-            sub.setTitle('加粗');
+            sub.setTitle(this.t.menuBold);
             sub.setIcon('bold');
             sub.onClick(() => this.toggleBold(editor, target));
         });
@@ -192,7 +205,7 @@ export default class TextColorPlugin extends Plugin {
         if (target.wrapped) {
             menu.addSeparator();
             menu.addItem((sub) => {
-                sub.setTitle('清除颜色');
+                sub.setTitle(this.t.menuClearColor);
                 sub.setIcon('eraser');
                 sub.onClick(() => this.clearColor(editor, target));
             });
@@ -248,7 +261,7 @@ export default class TextColorPlugin extends Plugin {
             if (hasFontSizeInStyle(current)) {
                 menu.addSeparator();
                 menu.addItem((sub) => {
-                    sub.setTitle('清除大小');
+                    sub.setTitle(this.t.menuClearSize);
                     sub.setIcon('eraser');
                     sub.onClick(() => this.clearFontSize(editor, target));
                 });

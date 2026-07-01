@@ -1,5 +1,8 @@
 import { App, Setting, PluginSettingTab } from 'obsidian';
 import type TextColorPlugin from './main';
+import type { LangSetting } from './i18n';
+import { getTranslations, LANGUAGE_OPTIONS } from './i18n';
+import { colorsAreBuiltinDefaults, getDefaultColors } from './types';
 
 export class TextColorSettingTab extends PluginSettingTab {
     plugin: TextColorPlugin;
@@ -13,10 +16,30 @@ export class TextColorSettingTab extends PluginSettingTab {
         const { containerEl } = this;
         containerEl.empty();
 
-        new Setting(containerEl).setName('文字颜色').setHeading();
-        new Setting(containerEl).setDesc(
-            '配置右键菜单中可选的颜色。值可以是 CSS 颜色(如 #ff0000)或 var(--…) 引用主题变量。',
-        );
+        const t = this.plugin.t;
+
+        new Setting(containerEl)
+            .setName(t.settingLanguageName)
+            .setDesc(t.settingLanguageDesc)
+            .addDropdown((dd) => {
+                for (const opt of LANGUAGE_OPTIONS) dd.addOption(opt.value, opt.label);
+                dd.setValue(this.plugin.settings.language);
+                dd.onChange(async (value) => {
+                    this.plugin.settings.language = value as LangSetting;
+                    // If the palette is still the untouched built-in set, follow
+                    // the new language; otherwise leave the user's names alone.
+                    if (colorsAreBuiltinDefaults(this.plugin.settings.colors)) {
+                        this.plugin.settings.colors = getDefaultColors(
+                            getTranslations(this.plugin.settings.language),
+                        );
+                    }
+                    await this.plugin.saveSettings();
+                    this.display();
+                });
+            });
+
+        new Setting(containerEl).setName(t.settingColorsHeading).setHeading();
+        new Setting(containerEl).setDesc(t.settingColorsDesc);
 
         this.plugin.settings.colors.forEach((color, idx) => {
             const setting = new Setting(containerEl);
@@ -27,7 +50,7 @@ export class TextColorSettingTab extends PluginSettingTab {
             setting
                 .addText((text) =>
                     text
-                        .setPlaceholder('显示名称')
+                        .setPlaceholder(t.settingDisplayNamePlaceholder)
                         .setValue(color.name)
                         .onChange(async (v) => {
                             this.plugin.settings.colors[idx].name = v;
@@ -36,7 +59,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 )
                 .addText((text) =>
                     text
-                        .setPlaceholder('CSS 颜色或 var(--…)')
+                        .setPlaceholder(t.settingColorValuePlaceholder)
                         .setValue(color.value)
                         .onChange(async (v) => {
                             this.plugin.settings.colors[idx].value = v;
@@ -47,7 +70,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 .addExtraButton((btn) =>
                     btn
                         .setIcon('trash')
-                        .setTooltip('删除')
+                        .setTooltip(t.settingDeleteTooltip)
                         .onClick(async () => {
                             this.plugin.settings.colors.splice(idx, 1);
                             await this.plugin.saveSettings();
@@ -59,13 +82,13 @@ export class TextColorSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .addButton((btn) =>
                 btn
-                    .setButtonText('新增颜色')
+                    .setButtonText(t.settingAddColor)
                     .setCta()
                     .onClick(async () => {
                         const id = `custom-${Date.now().toString(36)}`;
                         this.plugin.settings.colors.push({
                             id,
-                            name: '新颜色',
+                            name: t.newColorName,
                             value: '#888888',
                         });
                         await this.plugin.saveSettings();
@@ -74,7 +97,7 @@ export class TextColorSettingTab extends PluginSettingTab {
             )
             .addButton((btn) =>
                 btn
-                    .setButtonText('恢复默认')
+                    .setButtonText(t.settingRestoreDefaults)
                     .setWarning()
                     .onClick(async () => {
                         this.plugin.resetColors();
@@ -83,10 +106,8 @@ export class TextColorSettingTab extends PluginSettingTab {
                     }),
             );
 
-        new Setting(containerEl).setName('文字大小').setHeading();
-        new Setting(containerEl).setDesc(
-            '配置右键菜单中可选的字号。值可以是任意 CSS 大小（如 14px、1.2em）。',
-        );
+        new Setting(containerEl).setName(t.settingSizesHeading).setHeading();
+        new Setting(containerEl).setDesc(t.settingSizesDesc);
 
         this.plugin.settings.fontSizes.forEach((size, idx) => {
             const setting = new Setting(containerEl);
@@ -94,7 +115,7 @@ export class TextColorSettingTab extends PluginSettingTab {
             setting
                 .addText((text) =>
                     text
-                        .setPlaceholder('显示名称')
+                        .setPlaceholder(t.settingDisplayNamePlaceholder)
                         .setValue(size.label)
                         .onChange(async (v) => {
                             this.plugin.settings.fontSizes[idx].label = v;
@@ -103,7 +124,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 )
                 .addText((text) =>
                     text
-                        .setPlaceholder('CSS 大小（如 16px）')
+                        .setPlaceholder(t.settingSizeValuePlaceholder)
                         .setValue(size.value)
                         .onChange(async (v) => {
                             this.plugin.settings.fontSizes[idx].value = v;
@@ -113,7 +134,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 .addExtraButton((btn) =>
                     btn
                         .setIcon('trash')
-                        .setTooltip('删除')
+                        .setTooltip(t.settingDeleteTooltip)
                         .onClick(async () => {
                             this.plugin.settings.fontSizes.splice(idx, 1);
                             await this.plugin.saveSettings();
@@ -125,7 +146,7 @@ export class TextColorSettingTab extends PluginSettingTab {
         new Setting(containerEl)
             .addButton((btn) =>
                 btn
-                    .setButtonText('新增字号')
+                    .setButtonText(t.settingAddSize)
                     .setCta()
                     .onClick(async () => {
                         this.plugin.settings.fontSizes.push({
@@ -138,7 +159,7 @@ export class TextColorSettingTab extends PluginSettingTab {
             )
             .addButton((btn) =>
                 btn
-                    .setButtonText('恢复默认')
+                    .setButtonText(t.settingRestoreDefaults)
                     .setWarning()
                     .onClick(async () => {
                         this.plugin.resetFontSizes();
