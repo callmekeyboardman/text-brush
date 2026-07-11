@@ -1,5 +1,8 @@
 import { EditorPosition } from 'obsidian';
 
+import type { LangSetting, Translations } from './i18n';
+import { SUPPORTED_LANGS, TRANSLATIONS } from './i18n';
+
 export interface ColorOption {
     /** Stable identifier, used as part of the CSS class name */
     id: string;
@@ -10,6 +13,7 @@ export interface ColorOption {
 }
 
 export interface TextColorSettings {
+    language: LangSetting;
     colors: ColorOption[];
     fontSizes: FontSizeOption[];
 }
@@ -38,20 +42,50 @@ export interface ResolvedTarget {
     wrapped: boolean;
 }
 
-export const DEFAULT_COLORS: ColorOption[] = [
-    { id: 'red',    name: '红色 Red',    value: 'var(--color-red)' },
-    { id: 'orange', name: '橙色 Orange', value: 'var(--color-orange)' },
-    { id: 'yellow', name: '黄色 Yellow', value: 'var(--color-yellow)' },
-    { id: 'green',  name: '绿色 Green',  value: 'var(--color-green)' },
-    { id: 'cyan',   name: '青色 Cyan',   value: 'var(--color-cyan)' },
-    { id: 'blue',   name: '蓝色 Blue',   value: 'var(--color-blue)' },
-    { id: 'purple', name: '紫色 Purple', value: 'var(--color-purple)' },
-    { id: 'pink',   name: '粉色 Pink',   value: 'var(--color-pink)' },
-    { id: 'gray',   name: '灰色 Gray',   value: '#95a5a6' },
+/**
+ * Built-in colors. Names are not stored here — they come from the active
+ * translation (see {@link getDefaultColors}) so the defaults follow the
+ * selected language.
+ */
+export const DEFAULT_COLOR_DEFS: { id: string; value: string }[] = [
+    { id: 'red',    value: 'var(--color-red)' },
+    { id: 'orange', value: 'var(--color-orange)' },
+    { id: 'yellow', value: 'var(--color-yellow)' },
+    { id: 'green',  value: 'var(--color-green)' },
+    { id: 'cyan',   value: 'var(--color-cyan)' },
+    { id: 'blue',   value: 'var(--color-blue)' },
+    { id: 'purple', value: 'var(--color-purple)' },
+    { id: 'pink',   value: 'var(--color-pink)' },
+    { id: 'gray',   value: '#95a5a6' },
 ];
 
+/** Build the default color palette with names in the given language. */
+export function getDefaultColors(t: Translations): ColorOption[] {
+    return DEFAULT_COLOR_DEFS.map((def) => ({
+        id: def.id,
+        value: def.value,
+        name: t.colorNames[def.id] ?? def.id,
+    }));
+}
+
+/**
+ * True if `colors` is still the untouched built-in palette (same ids and values
+ * in order, with every name matching one of the shipped languages). Used to
+ * decide whether it is safe to re-translate the names when the language changes,
+ * without clobbering a user's customizations.
+ */
+export function colorsAreBuiltinDefaults(colors: ColorOption[]): boolean {
+    if (colors.length !== DEFAULT_COLOR_DEFS.length) return false;
+    return colors.every((color, i) => {
+        const def = DEFAULT_COLOR_DEFS[i];
+        if (color.id !== def.id || color.value !== def.value) return false;
+        return SUPPORTED_LANGS.some((lang) => TRANSLATIONS[lang].colorNames[def.id] === color.name);
+    });
+}
+
 export const DEFAULT_SETTINGS: TextColorSettings = {
-    colors: DEFAULT_COLORS,
+    language: 'auto',
+    colors: getDefaultColors(TRANSLATIONS.en),
     fontSizes: DEFAULT_FONT_SIZES,
 };
 
