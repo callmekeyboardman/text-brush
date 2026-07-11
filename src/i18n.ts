@@ -143,6 +143,14 @@ export const LANGUAGE_OPTIONS: { value: LangSetting; label: string }[] = [
 
 /** Best-effort read of Obsidian's own UI language. Falls back to English. */
 function detectObsidianLang(): Lang {
+    // Obsidian always updates moment's locale to match the user's language setting.
+    try {
+        const locale = (activeWindow as unknown as { moment?: { locale?: () => string } }).moment?.locale?.();
+        if (typeof locale === 'string' && locale.toLowerCase().startsWith('zh')) return 'zh';
+        if (typeof locale === 'string' && locale !== '') return 'en';
+    } catch {
+        // moment may be unavailable; try localStorage next.
+    }
     try {
         const stored = activeWindow.localStorage.getItem('language');
         if (stored && stored.toLowerCase().startsWith('zh')) return 'zh';
