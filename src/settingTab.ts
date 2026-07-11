@@ -8,7 +8,7 @@ import type { SettingsTabId } from './types';
 type TabId = SettingsTabId;
 
 /** Tab order on the settings page. Append a new id here to add a tab. */
-const TAB_IDS: TabId[] = ['general', 'colors', 'fonts'];
+const TAB_IDS: TabId[] = ['general', 'colors', 'fonts', 'hyperlink'];
 
 export class TextColorSettingTab extends PluginSettingTab {
     plugin: TextColorPlugin;
@@ -65,6 +65,7 @@ export class TextColorSettingTab extends PluginSettingTab {
         this.renderGeneralTab(tabContents.get('general')!, t);
         this.renderColorsTab(tabContents.get('colors')!, t);
         this.renderFontsTab(tabContents.get('fonts')!, t);
+        this.renderHyperlinkTab(tabContents.get('hyperlink')!, t);
     }
 
     private getTabLabel(id: TabId, t: Translations): string {
@@ -72,6 +73,7 @@ export class TextColorSettingTab extends PluginSettingTab {
             general: t.settingTabGeneral,
             colors: t.settingTabColors,
             fonts: t.settingTabFonts,
+            hyperlink: t.settingTabHyperlink,
         };
         return map[id];
     }
@@ -228,6 +230,74 @@ export class TextColorSettingTab extends PluginSettingTab {
                         this.plugin.resetFontSizes();
                         await this.plugin.saveSettings();
                         this.display();
+                    }),
+            );
+    }
+
+    private renderHyperlinkTab(container: HTMLElement, t: Translations): void {
+        const h = this.plugin.settings.hyperlink;
+
+        new Setting(container)
+            .setName(t.hyperlinkEnabled)
+            .setDesc(t.hyperlinkEnabledDesc)
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(h.enabled)
+                    .onChange(async (value) => {
+                        h.enabled = value;
+                        await this.plugin.saveSettings();
+                    }),
+            );
+
+        new Setting(container)
+            .setName(t.hyperlinkTimeout)
+            .setDesc(t.hyperlinkTimeoutDesc)
+            .addText((text) =>
+                text
+                    .setValue(String(h.timeoutMs))
+                    .onChange(async (value) => {
+                        const n = parseInt(value, 10);
+                        if (Number.isNaN(n)) return;
+                        h.timeoutMs = Math.min(60000, Math.max(1000, n));
+                        await this.plugin.saveSettings();
+                    }),
+            );
+
+        new Setting(container)
+            .setName(t.hyperlinkSkipPrivate)
+            .setDesc(t.hyperlinkSkipPrivateDesc)
+            .addToggle((toggle) =>
+                toggle
+                    .setValue(h.skipPrivateHosts)
+                    .onChange(async (value) => {
+                        h.skipPrivateHosts = value;
+                        await this.plugin.saveSettings();
+                    }),
+            );
+
+        new Setting(container)
+            .setName(t.hyperlinkUserAgent)
+            .setDesc(t.hyperlinkUserAgentDesc)
+            .addText((text) =>
+                text
+                    .setPlaceholder('Mozilla/5.0 ...')
+                    .setValue(h.userAgent)
+                    .onChange(async (value) => {
+                        h.userAgent = value;
+                        await this.plugin.saveSettings();
+                    }),
+            );
+
+        new Setting(container)
+            .setName(t.hyperlinkExcludedDomains)
+            .setDesc(t.hyperlinkExcludedDomainsDesc)
+            .addTextArea((area) =>
+                area
+                    .setPlaceholder('example.com, *.ads.com')
+                    .setValue(h.excludedDomains)
+                    .onChange(async (value) => {
+                        h.excludedDomains = value;
+                        await this.plugin.saveSettings();
                     }),
             );
     }

@@ -2,6 +2,7 @@ import type { EditorPosition } from 'obsidian';
 import { Editor, Menu, MenuItem, Plugin } from 'obsidian';
 
 import { TextColorSettingTab } from './settingTab';
+import { HyperlinkPasteHandler } from './hyperlinkPaste';
 
 import type { ColorOption, TextColorSettings, ResolvedTarget, FontSizeOption } from './types';
 import type { Translations } from './i18n';
@@ -39,6 +40,7 @@ declare module 'obsidian' {
 export default class TextColorPlugin extends Plugin {
     settings!: TextColorSettings;
     private submenuSupported = false;
+    private hyperlinkHandler!: HyperlinkPasteHandler;
 
     /** Active translation table, based on the language setting. */
     get t(): Translations {
@@ -49,6 +51,13 @@ export default class TextColorPlugin extends Plugin {
         await this.loadSettings();
         this.submenuSupported = this.detectSubmenuSupport();
 
+        this.hyperlinkHandler = new HyperlinkPasteHandler(this.settings.hyperlink);
+        this.registerEvent(
+            this.app.workspace.on('editor-paste', (evt: ClipboardEvent, editor: Editor) => {
+                this.hyperlinkHandler.handlePaste(evt, editor);
+            }),
+        );
+
         this.registerEvent(
             this.app.workspace.on('editor-menu', (menu, editor) =>
                 this.buildMenu(menu, editor),
@@ -56,6 +65,10 @@ export default class TextColorPlugin extends Plugin {
         );
 
         this.addSettingTab(new TextColorSettingTab(this.app, this));
+    }
+
+    onunload() {
+        this.hyperlinkHandler?.destroy();
     }
 
     async loadSettings() {
@@ -78,6 +91,7 @@ export default class TextColorPlugin extends Plugin {
 
     async saveSettings() {
         await this.saveData(this.settings);
+        this.hyperlinkHandler?.updateSettings(this.settings.hyperlink);
     }
 
     resetColors() {

@@ -54,6 +54,19 @@ export interface Translations {
     newColorName: string;
     /** Built-in color names keyed by color id. */
     colorNames: Record<string, string>;
+
+    // Settings — hyperlink tab
+    settingTabHyperlink: string;
+    hyperlinkEnabled: string;
+    hyperlinkEnabledDesc: string;
+    hyperlinkTimeout: string;
+    hyperlinkTimeoutDesc: string;
+    hyperlinkSkipPrivate: string;
+    hyperlinkSkipPrivateDesc: string;
+    hyperlinkUserAgent: string;
+    hyperlinkUserAgentDesc: string;
+    hyperlinkExcludedDomains: string;
+    hyperlinkExcludedDomainsDesc: string;
 }
 
 export const TRANSLATIONS: Record<Lang, Translations> = {
@@ -88,6 +101,17 @@ export const TRANSLATIONS: Record<Lang, Translations> = {
         settingRestoreDefaults: 'Restore defaults',
 
         newColorName: 'New color',
+        settingTabHyperlink: 'Hyperlink',
+        hyperlinkEnabled: 'Enable auto hyperlink',
+        hyperlinkEnabledDesc: 'When pasting a URL, automatically convert it to a Markdown link.',
+        hyperlinkTimeout: 'Fetch timeout (ms)',
+        hyperlinkTimeoutDesc: 'Maximum time to wait for page title fetch. Range: 1000–60000.',
+        hyperlinkSkipPrivate: 'Skip private hosts',
+        hyperlinkSkipPrivateDesc: 'Do not fetch titles for localhost or private IP addresses.',
+        hyperlinkUserAgent: 'User agent',
+        hyperlinkUserAgentDesc: 'User-Agent header sent when fetching page titles.',
+        hyperlinkExcludedDomains: 'Excluded domains',
+        hyperlinkExcludedDomainsDesc: 'Domains to skip (comma-separated). Supports wildcards: *.example.com',
         colorNames: {
             red: 'Red',
             orange: 'Orange',
@@ -130,6 +154,17 @@ export const TRANSLATIONS: Record<Lang, Translations> = {
         settingRestoreDefaults: '恢复默认',
 
         newColorName: '新颜色',
+        settingTabHyperlink: '超链接',
+        hyperlinkEnabled: '启用自动超链接',
+        hyperlinkEnabledDesc: '粘贴 URL 时，自动转换为 Markdown 链接格式。',
+        hyperlinkTimeout: '抓取超时（毫秒）',
+        hyperlinkTimeoutDesc: '等待页面标题抓取的最长时间，范围 1000–60000。',
+        hyperlinkSkipPrivate: '跳过私有地址',
+        hyperlinkSkipPrivateDesc: '不对 localhost 或私有 IP 地址发起标题抓取请求。',
+        hyperlinkUserAgent: 'User-Agent',
+        hyperlinkUserAgentDesc: '抓取页面标题时使用的 User-Agent 请求头。',
+        hyperlinkExcludedDomains: '排除域名',
+        hyperlinkExcludedDomainsDesc: '不进行标题抓取的域名（逗号分隔），支持通配符：*.example.com',
         colorNames: {
             red: '红色',
             orange: '橙色',

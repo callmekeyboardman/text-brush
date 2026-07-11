@@ -18,14 +18,24 @@ export interface TextColorSettings {
     fontSizes: FontSizeOption[];
     /** Last-opened settings tab, remembered across sessions. */
     activeSettingsTab: SettingsTabId;
+    hyperlink: HyperlinkSettings;
 }
 
 /** Valid settings-tab identifiers. Mirrors `TAB_IDS` in settingTab.ts. */
-export type SettingsTabId = 'general' | 'colors' | 'fonts';
+export type SettingsTabId = 'general' | 'colors' | 'fonts' | 'hyperlink';
 
 export interface FontSizeOption {
     label: string;
     value: string;
+}
+
+/** Settings for the auto-hyperlink-on-paste feature. */
+export interface HyperlinkSettings {
+    enabled: boolean;
+    timeoutMs: number;
+    skipPrivateHosts: boolean;
+    userAgent: string;
+    excludedDomains: string;
 }
 
 export const DEFAULT_FONT_SIZES: FontSizeOption[] = [
@@ -93,6 +103,13 @@ export const DEFAULT_SETTINGS: TextColorSettings = {
     colors: getDefaultColors(TRANSLATIONS.en),
     fontSizes: DEFAULT_FONT_SIZES,
     activeSettingsTab: 'general',
+    hyperlink: {
+        enabled: true,
+        timeoutMs: 8000,
+        skipPrivateHosts: true,
+        userAgent: 'Mozilla/5.0 (compatible; ObsidianAutoHyperlink/1.1; +https://obsidian.md)',
+        excludedDomains: '',
+    },
 };
 
 // Match a single span produced by this plugin. Captures the color id and

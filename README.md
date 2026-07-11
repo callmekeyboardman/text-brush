@@ -2,7 +2,7 @@
 
 [中文文档|Chinese](README_zh.md)
 
-An Obsidian plugin that lets you quickly apply, switch, or clear text color and font size via the right-click context menu.
+An Obsidian plugin that lets you quickly apply, switch, or clear text color and font size via the right-click context menu, and automatically converts pasted URLs into Markdown links.
 
 ## Features
 
@@ -23,6 +23,16 @@ An Obsidian plugin that lets you quickly apply, switch, or clear text color and 
 - **Stackable** — Can be combined with color on the same selection
 - **Clear size** — A "Clear size" option appears when sized text is selected
 - **Custom sizes** — Add, remove, or edit sizes in Settings; supports any CSS size value (px, em, etc.)
+
+### Auto Hyperlink
+
+- **Paste to link** — Pasting a bare HTTP/HTTPS URL converts it into a Markdown link `[title](url)`
+- **Selection-aware** — If text is selected when you paste, it becomes the link text immediately (`[selection](url)`) with no network request
+- **Async title fetch** — With no selection, a placeholder is inserted first, then the page title is fetched in the background and swapped in once available
+- **Graceful fallback** — If the title can't be fetched (timeout, HTTP error, private host), the URL itself is used as the link text (`[url](url)`)
+- **Privacy-aware** — Optionally skip title fetching for localhost and private IP ranges (10.x, 172.16–31.x, 192.168.x, `.local`, etc.)
+- **Excluded domains** — A comma-separated domain list lets specific sites keep Obsidian's native paste behavior; supports subdomain and wildcard matching (`example.com`, `.example.com`, `*.example.com`)
+- **Encoding-aware** — Correctly decodes page titles for non-UTF-8 pages (including GBK/GB2312)
 
 ### General
 
@@ -94,7 +104,7 @@ Applying only 16px font size to plain text:
 
 ## Settings
 
-The settings page is organized into three tabs, and the last-opened tab is remembered across sessions:
+The settings page is organized into four tabs, and the last-opened tab is remembered across sessions:
 
 ### General
 - **Language** — Choose the display language for the right-click menu and settings tab: **Auto** (follow Obsidian, fall back to English), **English**, or **中文**
@@ -110,6 +120,13 @@ The settings page is organized into three tabs, and the last-opened tab is remem
 - Remove sizes you don't need
 - Click "Add size" to add a custom size
 - Click "Restore defaults" to reset to the default size list
+
+### Hyperlink
+- **Enable auto hyperlink** — Toggle the paste-to-link behavior on or off
+- **Fetch timeout (ms)** — Maximum time to wait for a page title fetch (range 1000–60000)
+- **Skip private hosts** — Don't fetch titles for localhost or private IP addresses
+- **User agent** — The `User-Agent` header sent when fetching page titles
+- **Excluded domains** — Comma-separated domains to skip; supports subdomains and wildcards (`example.com`, `*.example.com`)
 
 Supported CSS values:
 - Colors: hex `#ff0000`, RGB `rgb(255, 0, 0)`, HSL, CSS variables `var(--color-red)`
@@ -137,9 +154,10 @@ npm run build    # type check + production build
 
 ```
 src/
-├── main.ts             # Plugin main class (menu building, selection parsing, document operations)
+├── main.ts             # Plugin main class (menu building, selection parsing, document operations, paste handler registration)
 ├── types.ts            # Interfaces, constants, regex, utility functions
 ├── i18n.ts             # Self-contained i18n layer (translation tables, language detection)
+├── hyperlinkPaste.ts   # Auto-hyperlink-on-paste (URL→Markdown link, title fetching)
 └── settingTab.ts       # Settings tab UI
 styles.css              # Color class definitions + menu swatch styles
 esbuild.config.mjs      # Build configuration
