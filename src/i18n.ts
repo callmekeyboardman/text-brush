@@ -53,8 +53,8 @@ export interface Translations {
 
 export const TRANSLATIONS: Record<Lang, Translations> = {
     en: {
-        menuTextColor: 'Text Color',
-        menuTextSize: 'Text Size',
+        menuTextColor: 'Text color',
+        menuTextSize: 'Text size',
         menuBold: 'Bold',
         menuClearColor: 'Clear color',
         menuClearSize: 'Clear size',
@@ -62,13 +62,13 @@ export const TRANSLATIONS: Record<Lang, Translations> = {
         settingLanguageName: 'Language',
         settingLanguageDesc: 'Display language for the right-click menu and this settings tab.',
 
-        settingColorsHeading: 'Text Color',
+        settingColorsHeading: 'Text color',
         settingColorsDesc:
             'Configure the colors available in the right-click menu. A value can be a CSS color (e.g. #ff0000) or var(--…) to reference a theme variable.',
         settingColorValuePlaceholder: 'CSS color or var(--…)',
         settingAddColor: 'Add color',
 
-        settingSizesHeading: 'Text Size',
+        settingSizesHeading: 'Text size',
         settingSizesDesc:
             'Configure the font sizes available in the right-click menu. A value can be any CSS size (e.g. 14px or 1.2em).',
         settingSizeValuePlaceholder: 'CSS size (e.g. 16px)',
@@ -144,7 +144,7 @@ export const LANGUAGE_OPTIONS: { value: LangSetting; label: string }[] = [
 /** Best-effort read of Obsidian's own UI language. Falls back to English. */
 function detectObsidianLang(): Lang {
     try {
-        const stored = window.localStorage.getItem('language');
+        const stored = activeWindow.localStorage.getItem('language');
         if (stored && stored.toLowerCase().startsWith('zh')) return 'zh';
     } catch {
         // localStorage may be unavailable; fall through to the default.
