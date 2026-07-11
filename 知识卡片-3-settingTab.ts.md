@@ -10,7 +10,7 @@
 |------|-----|
 | 路径 | `src/settingTab.ts` |
 | 导出 | `class TextColorSettingTab extends PluginSettingTab` |
-| 依赖 | `obsidian`（App, Setting, PluginSettingTab）、`./main`（type-only）、`./types`（DEFAULT_COLORS, DEFAULT_FONT_SIZES） |
+| 依赖 | `obsidian`（App, Setting, PluginSettingTab）、`./main`（type-only）、`./types`（`getDefaultColors`, `colorsAreBuiltinDefaults`）、`./i18n`（type: `LangSetting`；value: `getTranslations`, `LANGUAGE_OPTIONS`） |
 
 ---
 
@@ -20,8 +20,10 @@
 |------|------|
 | 1 | import { App, Setting, PluginSettingTab } from 'obsidian' |
 | 2 | `import type TextColorPlugin from './main'` — 仅类型引用，避免循环依赖 |
-| 3 | import { DEFAULT_COLORS } from './types' |
-| 5–88 | 类：TextColorSettingTab |
+| 3 | `import type { LangSetting } from './i18n'` |
+| 4 | import { getTranslations, LANGUAGE_OPTIONS } from './i18n' |
+| 5 | import { colorsAreBuiltinDefaults, getDefaultColors } from './types' |
+| 类 | TextColorSettingTab |
 
 ---
 
@@ -62,8 +64,10 @@ constructor(app: App, plugin: TextColorPlugin)
 
 ```
 ┌──────────────────────────────────────────┐
-│ h2: 文字颜色                              │
-│ p:  配置右键菜单中可选的颜色...             │
+│ Setting: 语言  [下拉: Auto/English/中文]   │  ← 顶部语言选择器
+│                                           │
+│ Heading: 文字颜色（setName().setHeading()）│
+│ Setting(desc): 配置右键菜单中可选的颜色... │
 │                                           │
 │ ┌── 颜色列表（forEach 循环）─────────────┐ │
 │ │ [色块] [名称输入框] [CSS值输入框] [🗑️]  │ │
@@ -73,8 +77,8 @@ constructor(app: App, plugin: TextColorPlugin)
 │                                           │
 │ [+ 新增颜色]  [⚠️ 恢复默认]               │
 │                                           │
-│ h2: 文字大小                              │
-│ p:  配置右键菜单中可选的字号...             │
+│ Heading: 文字大小                         │
+│ Setting(desc): 配置右键菜单中可选的字号... │
 │                                           │
 │ ┌── 字号列表（forEach 循环）─────────────┐ │
 │ │ [名称输入框] [CSS值输入框] [🗑️]         │ │
@@ -86,21 +90,29 @@ constructor(app: App, plugin: TextColorPlugin)
 └──────────────────────────────────────────┘
 ```
 
+> 所有标签、标题、占位符、按钮文字都来自 `const t = this.plugin.t;`，随语言实时切换。标题用 `new Setting(containerEl).setName(...).setHeading()`（Obsidian 标准 Setting API），而非直接 `createEl('h2')`。
+
 **页面构造过程（按代码执行顺序，从上到下渲染）：**
 
 ```typescript
 const { containerEl } = this;
 containerEl.empty();    // 1. 清空旧内容
+const t = this.plugin.t; // 2. 取当前语言翻译表
 
-containerEl.createEl('h2', { text: '文字颜色' });         // 2. 创建标题
-containerEl.createEl('p', { text: '配置说明...', cls: '...' }); // 3. 创建说明文字
+new Setting(containerEl)                                   // 3. 语言选择器（下拉）
+    .setName(t.settingLanguageName)
+    .setDesc(t.settingLanguageDesc)
+    .addDropdown(dd => /* Auto/English/中文，onChange 切换语言 */);
 
-this.plugin.settings.colors.forEach((color, idx) => {     // 4. 遍历颜色列表
+new Setting(containerEl).setName(t.settingColorsHeading).setHeading(); // 4. 标题
+new Setting(containerEl).setDesc(t.settingColorsDesc);    // 5. 说明文字
+
+this.plugin.settings.colors.forEach((color, idx) => {     // 6. 遍历颜色列表
     const setting = new Setting(containerEl);             //    创建空的设置行并追加到容器
     // → 往 setting 里填充色块、输入框、删除按钮
 });
 
-new Setting(containerEl)                                   // 5. 按钮行（最后创建，所以在最下面）
+new Setting(containerEl)                                   // 7. 按钮行（最后创建，所以在最下面）
     .addButton(btn => /* 新增颜色 */)
     .addButton(btn => /* 恢复默认 */);
 ```
@@ -132,6 +144,27 @@ new Setting(containerEl)                                   // 5. 按钮行（最
 
 ## 交互逻辑详解
 
+### 语言切换（下拉）
+
+页面顶部的语言下拉由 `LANGUAGE_OPTIONS`（Auto / English / 中文）填充，`onChange` 逻辑：
+
+```typescript
+this.plugin.settings.language = value as LangSetting;
+// 仅当调色板仍是未改动的内置默认时，才跟随新语言重译颜色名
+if (colorsAreBuiltinDefaults(this.plugin.settings.colors)) {
+    this.plugin.settings.colors = getDefaultColors(
+        getTranslations(this.plugin.settings.language),
+    );
+}
+await this.plugin.saveSettings();
+this.display();   // 重绘，使菜单/标签立即变为新语言
+```
+
+**关键点：**
+- `colorsAreBuiltinDefaults()` 守卫确保**用户自定义过的调色板不会被覆盖**——改过名称/值/增删后切换语言，颜色保持原样
+- `this.display()` 重绘整页，语言变化立即反映到所有标签、标题、占位符、按钮文字
+- 由于 `plugin.t` 是 getter，重绘时读取的就是新语言的翻译表
+
 ### 颜色列表渲染
 
 对 `plugin.settings.colors` 数组进行 `forEach` 遍历，每个颜色生成一行 `Setting`：
@@ -147,16 +180,17 @@ new Setting(containerEl)                                   // 5. 按钮行（最
 
 ```typescript
 const id = `custom-${Date.now().toString(36)}`;
-plugin.settings.colors.push({ id, name: '新颜色', value: '#888888' });
+plugin.settings.colors.push({ id, name: t.newColorName, value: '#888888' });
 ```
 
 - ID 格式：`custom-` + 时间戳 base36 编码（如 `custom-lx5f3k2`），确保唯一且稳定
+- 新颜色名称 `t.newColorName` 取自当前语言（英文 "New color" / 中文 "新颜色"）
 - 保存后调用 `display()` 重绘以显示新行
 
 ### 恢复默认
 
 ```typescript
-plugin.resetColors();   // colors = DEFAULT_COLORS 的深拷贝
+plugin.resetColors();   // colors = getDefaultColors(this.t)，按当前语言生成
 await plugin.saveSettings();
 this.display();         // 重绘
 ```
@@ -194,8 +228,9 @@ this.display();
 ## 设计要点
 
 1. **无确认按钮** — 每次字段变更立即 `saveSettings()`，减少用户操作步骤
-2. **完全重绘** — 增删操作后调用 `display()` 重建 DOM，实现简单可靠（颜色数量少，无性能问题）
+2. **完全重绘** — 增删/切换语言后调用 `display()` 重建 DOM，实现简单可靠（颜色数量少，无性能问题）
 3. **色块实时预览** — CSS 值输入框 onChange 同步更新色块 `backgroundColor`，即时反馈
+4. **语言即时生效** — 切换语言后重绘整页；所有文案经 `plugin.t` 读取，无需逐个 setText，且用 `colorsAreBuiltinDefaults()` 守卫保护用户自定义颜色
 
 ### 为什么选择全量重绘而非局部更新？
 

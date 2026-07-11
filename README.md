@@ -8,7 +8,7 @@ An Obsidian plugin that lets you quickly apply, switch, or clear text color and 
 
 ### Text Color
 
-- **Right-click to color** — Select text, right-click, and pick a color from the "Text Color" submenu
+- **Right-click to color** — Select text, right-click, and pick a color from the "Text color" submenu
 - **Smart replace** — Re-coloring already-colored text replaces the color in place without nesting `<span>` tags
 - **Clear color** — A "Clear color" option appears when colored text is selected
 - **Bold support** — A built-in "Bold" option appends `font-weight: bold` to colored text
@@ -18,7 +18,7 @@ An Obsidian plugin that lets you quickly apply, switch, or clear text color and 
 
 ### Font Size
 
-- **Right-click to resize** — Select text, right-click, and pick a size from the "Font Size" submenu
+- **Right-click to resize** — Select text, right-click, and pick a size from the "Text size" submenu
 - **Smart replace** — Re-sizing already-sized text replaces the size in place
 - **Stackable** — Can be combined with color on the same selection
 - **Clear size** — A "Clear size" option appears when sized text is selected
@@ -27,6 +27,7 @@ An Obsidian plugin that lets you quickly apply, switch, or clear text color and 
 ### General
 
 - **Version compatible** — Automatically detects whether Obsidian supports submenus; falls back to a flat menu if not
+- **Multilingual UI** — The right-click menu and settings tab are available in English and Chinese. A **Language** selector (Auto / English / 中文) in Settings lets you override the language; **Auto** follows Obsidian's own UI language and falls back to English. Built-in color names are translated to match, and switching language re-translates the default palette only while it is still untouched — your customizations are never overwritten.
 
 ## Default Palette
 
@@ -94,6 +95,9 @@ Applying only 16px font size to plain text:
 
 Go to **Settings → text-brush** to:
 
+### Language
+- Choose the display language for the right-click menu and settings tab: **Auto** (follow Obsidian, fall back to English), **English**, or **中文**
+
 ### Color Settings
 - Edit the display name and CSS value for each color
 - Remove colors you don't need
@@ -134,6 +138,7 @@ npm run build    # type check + production build
 src/
 ├── main.ts             # Plugin main class (menu building, selection parsing, document operations)
 ├── types.ts            # Interfaces, constants, regex, utility functions
+├── i18n.ts             # Self-contained i18n layer (translation tables, language detection)
 └── settingTab.ts       # Settings tab UI
 styles.css              # Color class definitions + menu swatch styles
 esbuild.config.mjs      # Build configuration

@@ -10,7 +10,7 @@
 |------|-----|
 | 路径 | `src/main.ts` |
 | 导出 | `default class TextColorPlugin extends Plugin` |
-| 依赖 | `obsidian`（type: EditorPosition；value: Editor, Menu, MenuItem, Plugin）、`./types`（type: ColorOption, TextColorSettings, ResolvedTarget；value: DEFAULT_COLORS, DEFAULT_SETTINGS, 正则, 工具函数）、`./settingTab` |
+| 依赖 | `obsidian`（type: EditorPosition；value: Editor, Menu, MenuItem, Plugin）、`./types`（type: ColorOption, TextColorSettings, ResolvedTarget；value: getDefaultColors, DEFAULT_FONT_SIZES, DEFAULT_SETTINGS, 正则, 工具函数）、`./i18n`（type: Translations；value: getTranslations）、`./settingTab` |
 
 ---
 
@@ -67,6 +67,9 @@ declare module 'obsidian' {
 |------|------|------|
 | `settings` | `TextColorSettings` | 当前颜色配置 |
 | `submenuSupported` | `boolean` | 运行时是否支持子菜单 |
+| `t`（getter） | `Translations` | 根据 `settings.language` 解析出的当前翻译表，菜单和设置页所有文案由此读取 |
+
+**`get t()` 访问器：** 定义为 getter 而非普通属性，每次访问都重新调用 `getTranslations(this.settings.language)`。这样在语言设置变化后（无需缓存失效逻辑）下一次读取即返回最新翻译；对于 `auto` 还会实时反映 Obsidian 当前界面语言。
 
 ### 方法总览
 
@@ -86,7 +89,7 @@ declare module 'obsidian' {
 | `reselect()` | 替换后重新选中文字，保持用户体验 |
 | `loadSettings()` | 从 Obsidian data.json 读取设置，合并默认值 |
 | `saveSettings()` | 持久化设置到 data.json |
-| `resetColors()` | 重置调色板为默认 |
+| `resetColors()` | 重置调色板为默认（`getDefaultColors(this.t)`，按当前语言生成名称） |
 | `resetFontSizes()` | 重置字号列表为默认 |
 
 ---
@@ -147,24 +150,29 @@ this.registerEvent(
 ### loadSettings()
 
 1. 从 Obsidian 的 `loadData()` 读取 `data.json` 文件（文件位置默认是 `.obsidian/plugins/text-brush/data.json`）
-2. 用读取出来的结果，覆盖插件的默认设置的 DEFAULT_SETTINGS，作为 `settings` 的值
-3. 若 `data.json` 内容为空，`settings` 使用默认设置的深拷贝
+2. 用读取出来的结果，覆盖插件的默认设置 DEFAULT_SETTINGS，作为 `settings` 的值
+3. **按语言生成默认调色板**：判断 `raw?.colors` 是否为有效非空数组——若用户从未保存过自己的调色板，则用 `getDefaultColors(this.t)` 按**当前语言**生成默认颜色（含本地化名称），使全新安装匹配解析后的（如 `auto`）语言；字号同理用 `DEFAULT_FONT_SIZES` 兜底
 
 > 因为 `data.json` 是用户数据文件，内容不可控，所以用 `Partial<TextColorSettings>` 表示，任何属性都可能缺失，甚至整个对象都不存在。
+>
+> ⚠️ 判空基于**原始的 `raw?.colors`** 而非合并后的 `this.settings.colors`——因为合并后总是非空（默认值已填入），必须回看原始数据才能区分"用户存过"与"用默认值"。
 
 `data.json` 内容示例：
 
 ```json
 {
+  "language": "auto",
   "colors": [
     {
       "id": "red",
-      "name": "红色 Red",
+      "name": "Red",
       "value": "var(--color-red)"
     }
   ]
 }
 ```
+
+> `language` 字段取值 `"auto"` | `"en"` | `"zh"`；`name` 随保存时的语言而定（此处为英文 `Red`，中文界面则为 `红色`）。
 
 ### detectSubmenuSupport()
 
@@ -189,6 +197,8 @@ this.registerEvent(
   ├─ 是 → 添加「文字颜色」菜单项，调用 setSubmenu() 创建子菜单
   └─ 否 → 在主菜单中添加分隔线 + 禁用的标题项 + 颜色列表 + 分隔线
 ```
+
+> 所有菜单标题（文字颜色、文字大小、加粗、清除颜色、清除大小）均通过 `this.t.menuXxx` 从当前翻译表读取，不再硬编码；`t` 在方法开头取一次（`const t = this.t;`）复用。
 
 关键在于 `resolveTarget` 方法。
 

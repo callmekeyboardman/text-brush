@@ -25,20 +25,23 @@
 ### 通用特性
 
 - **版本兼容** — 自动检测 Obsidian 是否支持子菜单，不支持时退化为扁平菜单
+- **多语言界面** — 右键菜单与设置页支持中文和英文。设置页提供**语言**选择器（Auto / English / 中文）可手动切换；**Auto** 跟随 Obsidian 的界面语言，无法识别时回退英文。内置颜色名称也会随语言翻译；切换语言时，仅当调色板仍为未修改的默认值才会重新翻译，用户的自定义内容不会被覆盖。
 
 ## 默认调色板
 
+> 颜色名称随当前语言自动生成（下表为中文），英文界面下显示为 Red、Orange 等。
+
 | 颜色 | CSS 值 |
 |------|--------|
-| 红色 Red | `var(--color-red)` |
-| 橙色 Orange | `var(--color-orange)` |
-| 黄色 Yellow | `var(--color-yellow)` |
-| 绿色 Green | `var(--color-green)` |
-| 青色 Cyan | `var(--color-cyan)` |
-| 蓝色 Blue | `var(--color-blue)` |
-| 紫色 Purple | `var(--color-purple)` |
-| 粉色 Pink | `var(--color-pink)` |
-| 灰色 Gray | `#95a5a6` |
+| 红色 | `var(--color-red)` |
+| 橙色 | `var(--color-orange)` |
+| 黄色 | `var(--color-yellow)` |
+| 绿色 | `var(--color-green)` |
+| 青色 | `var(--color-cyan)` |
+| 蓝色 | `var(--color-blue)` |
+| 紫色 | `var(--color-purple)` |
+| 粉色 | `var(--color-pink)` |
+| 灰色 | `#95a5a6` |
 
 ## 默认字号
 
@@ -86,6 +89,9 @@
 
 进入 **设置 → text-brush**，可以：
 
+### 语言
+- 选择右键菜单和设置页的显示语言：**Auto**（跟随 Obsidian，无法识别时回退英文）、**English** 或 **中文**
+
 ### 颜色设置
 - 修改每个颜色的显示名称和 CSS 值
 - 删除不需要的颜色
@@ -126,6 +132,7 @@ npm run build    # 类型检查 + 生产构建
 src/
 ├── main.ts             # 插件主类（菜单构建、选区解析、文档操作）
 ├── types.ts            # 接口、常量、正则、工具函数
+├── i18n.ts             # 自包含的 i18n 层（翻译表、语言检测）
 └── settingTab.ts       # 设置页 UI
 styles.css              # 颜色 class 定义 + 菜单色块样式
 esbuild.config.mjs      # 构建配置

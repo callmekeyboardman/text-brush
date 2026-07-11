@@ -9,7 +9,7 @@
 | 属性 | 值 |
 |------|-----|
 | 路径 | `src/types.ts` |
-| 依赖 | `obsidian`（仅 `EditorPosition` 类型） |
+| 依赖 | `obsidian`（仅 `EditorPosition` 类型）、`./i18n`（type: `LangSetting`, `Translations`；value: `SUPPORTED_LANGS`, `TRANSLATIONS`） |
 
 ---
 
@@ -17,18 +17,13 @@
 
 | 行号 | 内容 |
 |------|------|
-| 1 | import（仅 EditorPosition 类型） |
-| 3–10 | 接口：ColorOption |
-| 12–14 | 接口：TextColorSettings |
-| 16–24 | 接口：ResolvedTarget |
-| 26–40 | 常量：DEFAULT_COLORS、DEFAULT_SETTINGS |
-| 42–59 | 正则常量：WRAPPER_RE、OPEN_TAG_RE、CLOSE_TAG_RE、SPAN_IN_LINE_RE |
-| 61–65 | 函数：unwrap() |
-| 67–72 | 函数：stripColorSpans() |
-| 74–80 | 函数：escapeAttr() |
-| 82–86 | 函数：wrap() |
-| 88–110 | Bold 相关：BOLD_WRAPPER_RE、unwrapBold()、wrapBold()、addBoldToStyle()、removeBoldFromStyle()、hasBoldInStyle() |
-| 112–120 | 函数：createColorTitle() |
+| 1 | import（`EditorPosition` 类型） |
+| 3–4 | import from `./i18n`（type: `LangSetting`, `Translations`；value: `SUPPORTED_LANGS`, `TRANSLATIONS`） |
+| 接口 | ColorOption / TextColorSettings（含 `language`）/ ResolvedTarget |
+| 常量 | DEFAULT_FONT_SIZES、DEFAULT_COLOR_DEFS、DEFAULT_SETTINGS |
+| 工厂函数 | getDefaultColors()、colorsAreBuiltinDefaults() |
+| 正则常量 | WRAPPER_RE、OPEN_TAG_RE、CLOSE_TAG_RE、SPAN_IN_LINE_RE |
+| 工具函数 | unwrap()、stripColorSpans()、escapeAttr()、wrap()、createColorTitle()、Bold/FontSize 相关 |
 
 ---
 
@@ -39,7 +34,7 @@
 ```typescript
 interface ColorOption {
     id: string;      // 稳定标识符，作为 CSS class 名的一部分（如 "red"、"custom-abc123"）
-    name: string;    // 菜单中展示的人类可读名称（如 "红色 Red"）
+    name: string;    // 菜单中展示的人类可读名称（随语言而定，如 "Red" / "红色"）
     value: string;   // 任意合法 CSS 颜色值（如 "var(--color-red)" 或 "#ff0000"）
 }
 ```
@@ -59,6 +54,7 @@ interface FontSizeOption {
 
 ```typescript
 interface TextColorSettings {
+    language: LangSetting;   // 'auto' | 'en' | 'zh'——界面语言设置
     colors: ColorOption[];
     fontSizes: FontSizeOption[];
 }
@@ -81,23 +77,45 @@ interface ResolvedTarget {
 
 ---
 
-## 常量
+## 常量与工厂函数
 
-### DEFAULT_COLORS
+### DEFAULT_COLOR_DEFS
 
-9 种预设颜色，使用 Obsidian 主题 CSS 变量：
+9 种预设颜色的**定义**——只含 `id` 和 `value`，**不含 name**（名称由翻译表提供，见 `getDefaultColors`），使默认调色板能跟随当前语言：
 
-| id | name | value |
-|----|------|-------|
-| red | 红色 Red | `var(--color-red)` |
-| orange | 橙色 Orange | `var(--color-orange)` |
-| yellow | 黄色 Yellow | `var(--color-yellow)` |
-| green | 绿色 Green | `var(--color-green)` |
-| cyan | 青色 Cyan | `var(--color-cyan)` |
-| blue | 蓝色 Blue | `var(--color-blue)` |
-| purple | 紫色 Purple | `var(--color-purple)` |
-| pink | 粉色 Pink | `var(--color-pink)` |
-| gray | 灰色 Gray | `#95a5a6` |
+| id | value |
+|----|-------|
+| red | `var(--color-red)` |
+| orange | `var(--color-orange)` |
+| yellow | `var(--color-yellow)` |
+| green | `var(--color-green)` |
+| cyan | `var(--color-cyan)` |
+| blue | `var(--color-blue)` |
+| purple | `var(--color-purple)` |
+| pink | `var(--color-pink)` |
+| gray | `#95a5a6` |
+
+> 类型为 `{ id: string; value: string }[]`。相比旧的 `DEFAULT_COLORS`，此处剥离了硬编码的双语 name，颜色名改由 i18n 翻译表按语言生成。
+
+### getDefaultColors(t)
+
+```typescript
+function getDefaultColors(t: Translations): ColorOption[]
+```
+
+工厂函数：把 `DEFAULT_COLOR_DEFS` 与传入语言的翻译表合并，为每个颜色补上本地化 `name`（`t.colorNames[def.id]`，缺失时回退 `id`）。`main.ts` 的 `loadSettings()`/`resetColors()` 和设置页切换语言时都调用它。
+
+### colorsAreBuiltinDefaults(colors)
+
+```typescript
+function colorsAreBuiltinDefaults(colors: ColorOption[]): boolean
+```
+
+判断给定调色板是否仍是**未被用户改动的内置默认值**——长度、每项的 `id`/`value` 按顺序一致，且每个 `name` 能匹配到**任一已支持语言**（`SUPPORTED_LANGS` × `TRANSLATIONS`）的对应颜色名。
+
+**用途：** 设置页切换语言时，据此决定是否安全地重新翻译颜色名。只有仍为默认调色板时才重译；用户一旦改过名称/值/增删，即返回 `false`，从而**绝不覆盖用户自定义**。
+
+> 匹配所有语言（而非仅当前语言）是关键：这样从 en 切到 zh 再切回来，中途生成的另一语言默认名仍被识别为"默认"，可持续跟随语言。
 
 ### DEFAULT_FONT_SIZES
 
@@ -115,10 +133,10 @@ interface ResolvedTarget {
 ### DEFAULT_SETTINGS
 
 ```typescript
-{ colors: DEFAULT_COLORS, fontSizes: DEFAULT_FONT_SIZES }
+{ language: 'auto', colors: getDefaultColors(TRANSLATIONS.en), fontSizes: DEFAULT_FONT_SIZES }
 ```
 
-`loadSettings()` 加载时与 data.json 合并的兜底值。
+`loadSettings()` 加载时与 data.json 合并的兜底值。默认 `language: 'auto'`（跟随 Obsidian）；`colors` 以英文名初始化占位，`loadSettings()` 随后会在无用户数据时按解析后的实际语言用 `getDefaultColors(this.t)` 覆盖。
 
 ---
 
