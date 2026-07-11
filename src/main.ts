@@ -5,8 +5,8 @@ import { TextColorSettingTab } from './settingTab';
 import { HyperlinkPasteHandler } from './hyperlinkPaste';
 
 import type { ColorOption, TextColorSettings, ResolvedTarget, FontSizeOption } from './types';
-import type { Translations } from './i18n';
-import { getTranslations } from './i18n';
+import { t, resolveLang } from './i18n/i18n';
+import type { Locale } from './i18n/types';
 import {
     getDefaultColors,
     DEFAULT_FONT_SIZES,
@@ -42,9 +42,9 @@ export default class TextColorPlugin extends Plugin {
     private submenuSupported = false;
     private hyperlinkHandler!: HyperlinkPasteHandler;
 
-    /** Active translation table, based on the language setting. */
-    get t(): Translations {
-        return getTranslations(this.settings.language);
+    /** Resolved locale for the current language setting. */
+    get locale(): Locale {
+        return resolveLang(this.settings.language);
     }
 
     async onload() {
@@ -82,7 +82,7 @@ export default class TextColorPlugin extends Plugin {
         const savedColors = raw?.colors;
         const savedFontSizes = raw?.fontSizes;
         if (!Array.isArray(savedColors) || savedColors.length === 0) {
-            this.settings.colors = getDefaultColors(this.t);
+            this.settings.colors = getDefaultColors(this.settings.language);
         }
         if (!Array.isArray(savedFontSizes) || savedFontSizes.length === 0) {
             this.settings.fontSizes = DEFAULT_FONT_SIZES.map((s) => ({ ...s }));
@@ -95,7 +95,7 @@ export default class TextColorPlugin extends Plugin {
     }
 
     resetColors() {
-        this.settings.colors = getDefaultColors(this.t);
+        this.settings.colors = getDefaultColors(this.settings.language);
     }
 
     resetFontSizes() {
@@ -119,17 +119,17 @@ export default class TextColorPlugin extends Plugin {
         const target = this.resolveTarget(editor);
         if (!target) return;
 
-        const t = this.t;
+        const locale = this.locale;
 
         if (this.submenuSupported) {
             menu.addItem((item) => {
-                item.setTitle(t.menuTextColor);
+                item.setTitle(t('menu.textColor', locale));
                 item.setIcon('palette');
                 const submenu = item.setSubmenu!();
                 this.populateColorMenu(submenu, editor, target);
             });
             menu.addItem((item) => {
-                item.setTitle(t.menuTextSize);
+                item.setTitle(t('menu.textSize', locale));
                 item.setIcon('type');
                 const submenu = item.setSubmenu!();
                 this.populateFontSizeMenu(submenu, editor, target);
@@ -137,14 +137,14 @@ export default class TextColorPlugin extends Plugin {
         } else {
             menu.addSeparator();
             menu.addItem((item) => {
-                item.setTitle(`— ${t.menuTextColor} —`);
+                item.setTitle(`— ${t('menu.textColor', locale)} —`);
                 item.setIcon('palette');
                 item.setDisabled(true);
             });
             this.populateColorMenu(menu, editor, target);
             menu.addSeparator();
             menu.addItem((item) => {
-                item.setTitle(`— ${t.menuTextSize} —`);
+                item.setTitle(`— ${t('menu.textSize', locale)} —`);
                 item.setIcon('type');
                 item.setDisabled(true);
             });
@@ -272,7 +272,7 @@ export default class TextColorPlugin extends Plugin {
         }
         menu.addSeparator();
         menu.addItem((sub) => {
-            sub.setTitle(this.t.menuBold);
+            sub.setTitle(t('menu.bold', this.locale));
             sub.setIcon('bold');
             sub.onClick(() => this.toggleBold(editor, target));
         });
@@ -280,7 +280,7 @@ export default class TextColorPlugin extends Plugin {
         if (target.wrapped) {
             menu.addSeparator();
             menu.addItem((sub) => {
-                sub.setTitle(this.t.menuClearColor);
+                sub.setTitle(t('menu.clearColor', this.locale));
                 sub.setIcon('eraser');
                 sub.onClick(() => this.clearColor(editor, target));
             });
@@ -336,7 +336,7 @@ export default class TextColorPlugin extends Plugin {
             if (hasFontSizeInStyle(current)) {
                 menu.addSeparator();
                 menu.addItem((sub) => {
-                    sub.setTitle(this.t.menuClearSize);
+                    sub.setTitle(t('menu.clearSize', this.locale));
                     sub.setIcon('eraser');
                     sub.onClick(() => this.clearFontSize(editor, target));
                 });

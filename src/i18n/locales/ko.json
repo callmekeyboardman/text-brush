@@ -1,0 +1,60 @@
+{
+    "menu": {
+        "textColor": "글자 색상",
+        "textSize": "글자 크기",
+        "bold": "굵게",
+        "clearColor": "색상 지우기",
+        "clearSize": "크기 지우기"
+    },
+    "settingTab": {
+        "general": "일반",
+        "colors": "글자 색상",
+        "fonts": "글꼴",
+        "hyperlink": "하이퍼링크"
+    },
+    "language": {
+        "name": "언어",
+        "desc": "우클릭 메뉴와 이 설정 탭의 표시 언어입니다."
+    },
+    "colors": {
+        "heading": "글자 색상",
+        "desc": "우클릭 메뉴에서 선택할 수 있는 색상을 설정합니다. 값은 CSS 색상(예: #ff0000)이나 테마 변수를 참조하는 var(--…) 가 될 수 있습니다.",
+        "valuePlaceholder": "CSS 색상 또는 var(--…)",
+        "add": "색상 추가",
+        "newName": "새 색상",
+        "names": {
+            "red": "빨강",
+            "orange": "주황",
+            "yellow": "노랑",
+            "green": "초록",
+            "cyan": "청록",
+            "blue": "파랑",
+            "purple": "보라",
+            "pink": "분홍",
+            "gray": "회색"
+        }
+    },
+    "sizes": {
+        "heading": "글자 크기",
+        "desc": "우클릭 메뉴에서 선택할 수 있는 글꼴 크기를 설정합니다. 값은 임의의 CSS 크기(예: 14px, 1.2em)가 될 수 있습니다.",
+        "valuePlaceholder": "CSS 크기 (예: 16px)",
+        "add": "글꼴 크기 추가"
+    },
+    "shared": {
+        "displayNamePlaceholder": "표시 이름",
+        "deleteTooltip": "삭제",
+        "restoreDefaults": "기본값 복원"
+    },
+    "hyperlink": {
+        "enabled": "자동 하이퍼링크 활성화",
+        "enabledDesc": "URL을 붙여넣을 때 자동으로 Markdown 링크로 변환합니다.",
+        "timeout": "가져오기 시간 초과 (ms)",
+        "timeoutDesc": "페이지 제목 가져오기를 기다리는 최대 시간입니다. 범위: 1000–60000.",
+        "skipPrivate": "내부 호스트 건너뛰기",
+        "skipPrivateDesc": "localhost 또는 내부 IP 주소에 대한 제목을 가져오지 않습니다.",
+        "userAgent": "사용자 에이전트",
+        "userAgentDesc": "페이지 제목을 가져올 때 전송되는 User-Agent 헤더입니다.",
+        "excludedDomains": "제외 도메인",
+        "excludedDomainsDesc": "건너뛸 도메인(쉼표로 구분). 와일드카드 지원: *.example.com"
+    }
+}

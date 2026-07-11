@@ -38,7 +38,7 @@ An Obsidian plugin that lets you quickly apply, switch, or clear text color and 
 
 - **Version compatible** — Automatically detects whether Obsidian supports submenus; falls back to a flat menu if not
 - **Smart selection handling** — When a selection partially overlaps an existing colored span (starts outside, ends inside, or vice versa — including across lines), the replace range auto-expands to cover the whole span, so no broken `<span>` fragments are ever left behind
-- **Multilingual UI** — The right-click menu and settings tab are available in English and Chinese. A **Language** selector (Auto / English / 中文) in Settings lets you override the language; **Auto** follows Obsidian's own UI language and falls back to English. Built-in color names are translated to match, and switching language re-translates the default palette only while it is still untouched — your customizations are never overwritten.
+- **Multilingual UI** — The right-click menu and settings tab ship in 10 languages: English, 简体中文, 繁體中文, 日本語, 한국어, Deutsch, Français, Español, Русский, Português. A **Language** selector in Settings lets you override the language; **Auto** follows Obsidian's own UI language and falls back to English. Built-in color names are translated to match, and switching language re-translates the default palette only while it is still untouched — your customizations are never overwritten.
 
 ## Default Palette
 
@@ -107,7 +107,7 @@ Applying only 16px font size to plain text:
 The settings page is organized into four tabs, and the last-opened tab is remembered across sessions:
 
 ### General
-- **Language** — Choose the display language for the right-click menu and settings tab: **Auto** (follow Obsidian, fall back to English), **English**, or **中文**
+- **Language** — Choose the display language for the right-click menu and settings tab: **Auto** (follow Obsidian, fall back to English) or one of 10 supported languages (English, 简体中文, 繁體中文, 日本語, 한국어, Deutsch, Français, Español, Русский, Português)
 
 ### Text Color
 - Edit the display name and CSS value for each color
@@ -156,7 +156,11 @@ npm run build    # type check + production build
 src/
 ├── main.ts             # Plugin main class (menu building, selection parsing, document operations, paste handler registration)
 ├── types.ts            # Interfaces, constants, regex, utility functions
-├── i18n.ts             # Self-contained i18n layer (translation tables, language detection)
+├── i18n/               # i18n layer (t() function, locale resolution, translation JSON files)
+│   ├── i18n.ts         #   t(key, locale) function, resolveLang, English fallback
+│   ├── types.ts        #   Locale / TranslationKey types (key derived from en.json)
+│   ├── constants.ts    #   SUPPORTED_LOCALES metadata, LANGUAGE_OPTIONS
+│   └── locales/        #   One JSON per locale (en, zh-CN, zh-TW, ja, ko, de, fr, es, ru, pt)
 ├── hyperlinkPaste.ts   # Auto-hyperlink-on-paste (URL→Markdown link, title fetching)
 └── settingTab.ts       # Settings tab UI
 styles.css              # Color class definitions + menu swatch styles

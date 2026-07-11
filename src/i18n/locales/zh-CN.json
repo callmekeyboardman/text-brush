@@ -1,0 +1,60 @@
+{
+    "menu": {
+        "textColor": "文字颜色",
+        "textSize": "文字大小",
+        "bold": "加粗",
+        "clearColor": "清除颜色",
+        "clearSize": "清除大小"
+    },
+    "settingTab": {
+        "general": "通用",
+        "colors": "文字颜色",
+        "fonts": "字体",
+        "hyperlink": "超链接"
+    },
+    "language": {
+        "name": "语言",
+        "desc": "右键菜单和本设置页面的显示语言。"
+    },
+    "colors": {
+        "heading": "文字颜色",
+        "desc": "配置右键菜单中可选的颜色。值可以是 CSS 颜色(如 #ff0000)或 var(--…) 引用主题变量。",
+        "valuePlaceholder": "CSS 颜色或 var(--…)",
+        "add": "新增颜色",
+        "newName": "新颜色",
+        "names": {
+            "red": "红色",
+            "orange": "橙色",
+            "yellow": "黄色",
+            "green": "绿色",
+            "cyan": "青色",
+            "blue": "蓝色",
+            "purple": "紫色",
+            "pink": "粉色",
+            "gray": "灰色"
+        }
+    },
+    "sizes": {
+        "heading": "文字大小",
+        "desc": "配置右键菜单中可选的字号。值可以是任意 CSS 大小（如 14px、1.2em）。",
+        "valuePlaceholder": "CSS 大小（如 16px）",
+        "add": "新增字号"
+    },
+    "shared": {
+        "displayNamePlaceholder": "显示名称",
+        "deleteTooltip": "删除",
+        "restoreDefaults": "恢复默认"
+    },
+    "hyperlink": {
+        "enabled": "启用自动超链接",
+        "enabledDesc": "粘贴 URL 时，自动转换为 Markdown 链接格式。",
+        "timeout": "抓取超时（毫秒）",
+        "timeoutDesc": "等待页面标题抓取的最长时间，范围 1000–60000。",
+        "skipPrivate": "跳过私有地址",
+        "skipPrivateDesc": "不对 localhost 或私有 IP 地址发起标题抓取请求。",
+        "userAgent": "User-Agent",
+        "userAgentDesc": "抓取页面标题时使用的 User-Agent 请求头。",
+        "excludedDomains": "排除域名",
+        "excludedDomainsDesc": "不进行标题抓取的域名（逗号分隔），支持通配符：*.example.com"
+    }
+}

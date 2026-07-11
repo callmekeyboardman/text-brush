@@ -1,0 +1,60 @@
+{
+    "menu": {
+        "textColor": "Color del texto",
+        "textSize": "Tamaño del texto",
+        "bold": "Negrita",
+        "clearColor": "Quitar color",
+        "clearSize": "Quitar tamaño"
+    },
+    "settingTab": {
+        "general": "General",
+        "colors": "Color del texto",
+        "fonts": "Fuente",
+        "hyperlink": "Hipervínculo"
+    },
+    "language": {
+        "name": "Idioma",
+        "desc": "Idioma de visualización para el menú contextual y esta pestaña de ajustes."
+    },
+    "colors": {
+        "heading": "Color del texto",
+        "desc": "Configura los colores disponibles en el menú contextual. Un valor puede ser un color CSS (p. ej. #ff0000) o var(--…) para referenciar una variable del tema.",
+        "valuePlaceholder": "Color CSS o var(--…)",
+        "add": "Añadir color",
+        "newName": "Nuevo color",
+        "names": {
+            "red": "Rojo",
+            "orange": "Naranja",
+            "yellow": "Amarillo",
+            "green": "Verde",
+            "cyan": "Cian",
+            "blue": "Azul",
+            "purple": "Morado",
+            "pink": "Rosa",
+            "gray": "Gris"
+        }
+    },
+    "sizes": {
+        "heading": "Tamaño del texto",
+        "desc": "Configura los tamaños de fuente disponibles en el menú contextual. Un valor puede ser cualquier tamaño CSS (p. ej. 14px o 1.2em).",
+        "valuePlaceholder": "Tamaño CSS (p. ej. 16px)",
+        "add": "Añadir tamaño de fuente"
+    },
+    "shared": {
+        "displayNamePlaceholder": "Nombre para mostrar",
+        "deleteTooltip": "Eliminar",
+        "restoreDefaults": "Restaurar valores predeterminados"
+    },
+    "hyperlink": {
+        "enabled": "Activar hipervínculo automático",
+        "enabledDesc": "Al pegar una URL, convertirla automáticamente en un enlace Markdown.",
+        "timeout": "Tiempo de espera de obtención (ms)",
+        "timeoutDesc": "Tiempo máximo de espera para obtener el título de la página. Rango: 1000–60000.",
+        "skipPrivate": "Omitir hosts privados",
+        "skipPrivateDesc": "No obtener títulos para localhost ni direcciones IP privadas.",
+        "userAgent": "User agent",
+        "userAgentDesc": "Encabezado User-Agent enviado al obtener títulos de página.",
+        "excludedDomains": "Dominios excluidos",
+        "excludedDomainsDesc": "Dominios a omitir (separados por comas). Admite comodines: *.example.com"
+    }
+}

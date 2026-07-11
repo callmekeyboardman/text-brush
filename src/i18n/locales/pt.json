@@ -1,0 +1,60 @@
+{
+    "menu": {
+        "textColor": "Cor do texto",
+        "textSize": "Tamanho do texto",
+        "bold": "Negrito",
+        "clearColor": "Remover cor",
+        "clearSize": "Remover tamanho"
+    },
+    "settingTab": {
+        "general": "Geral",
+        "colors": "Cor do texto",
+        "fonts": "Fonte",
+        "hyperlink": "Hiperligação"
+    },
+    "language": {
+        "name": "Idioma",
+        "desc": "Idioma de exibição do menu de contexto e desta guia de configurações."
+    },
+    "colors": {
+        "heading": "Cor do texto",
+        "desc": "Configura as cores disponíveis no menu de contexto. Um valor pode ser uma cor CSS (ex. #ff0000) ou var(--…) para referenciar uma variável de tema.",
+        "valuePlaceholder": "Cor CSS ou var(--…)",
+        "add": "Adicionar cor",
+        "newName": "Nova cor",
+        "names": {
+            "red": "Vermelho",
+            "orange": "Laranja",
+            "yellow": "Amarelo",
+            "green": "Verde",
+            "cyan": "Ciano",
+            "blue": "Azul",
+            "purple": "Roxo",
+            "pink": "Rosa",
+            "gray": "Cinza"
+        }
+    },
+    "sizes": {
+        "heading": "Tamanho do texto",
+        "desc": "Configura os tamanhos de fonte disponíveis no menu de contexto. Um valor pode ser qualquer tamanho CSS (ex. 14px ou 1.2em).",
+        "valuePlaceholder": "Tamanho CSS (ex. 16px)",
+        "add": "Adicionar tamanho de fonte"
+    },
+    "shared": {
+        "displayNamePlaceholder": "Nome de exibição",
+        "deleteTooltip": "Excluir",
+        "restoreDefaults": "Restaurar padrões"
+    },
+    "hyperlink": {
+        "enabled": "Ativar hiperligação automática",
+        "enabledDesc": "Ao colar um URL, convertê-lo automaticamente num link Markdown.",
+        "timeout": "Tempo limite de obtenção (ms)",
+        "timeoutDesc": "Tempo máximo de espera pela obtenção do título da página. Intervalo: 1000–60000.",
+        "skipPrivate": "Ignorar hosts privados",
+        "skipPrivateDesc": "Não obter títulos para localhost ou endereços IP privados.",
+        "userAgent": "User agent",
+        "userAgentDesc": "Cabeçalho User-Agent enviado ao obter títulos de página.",
+        "excludedDomains": "Domínios excluídos",
+        "excludedDomainsDesc": "Domínios a ignorar (separados por vírgulas). Suporta curingas: *.example.com"
+    }
+}

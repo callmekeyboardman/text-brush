@@ -1,0 +1,60 @@
+{
+    "menu": {
+        "textColor": "Text color",
+        "textSize": "Text size",
+        "bold": "Bold",
+        "clearColor": "Clear color",
+        "clearSize": "Clear size"
+    },
+    "settingTab": {
+        "general": "General",
+        "colors": "Text Color",
+        "fonts": "Font",
+        "hyperlink": "Hyperlink"
+    },
+    "language": {
+        "name": "Language",
+        "desc": "Display language for the right-click menu and this settings tab."
+    },
+    "colors": {
+        "heading": "Text color",
+        "desc": "Configure the colors available in the right-click menu. A value can be a CSS color (e.g. #ff0000) or var(--…) to reference a theme variable.",
+        "valuePlaceholder": "CSS color or var(--…)",
+        "add": "Add color",
+        "newName": "New color",
+        "names": {
+            "red": "Red",
+            "orange": "Orange",
+            "yellow": "Yellow",
+            "green": "Green",
+            "cyan": "Cyan",
+            "blue": "Blue",
+            "purple": "Purple",
+            "pink": "Pink",
+            "gray": "Gray"
+        }
+    },
+    "sizes": {
+        "heading": "Text size",
+        "desc": "Configure the font sizes available in the right-click menu. A value can be any CSS size (e.g. 14px or 1.2em).",
+        "valuePlaceholder": "CSS size (e.g. 16px)",
+        "add": "Add font size"
+    },
+    "shared": {
+        "displayNamePlaceholder": "Display name",
+        "deleteTooltip": "Delete",
+        "restoreDefaults": "Restore defaults"
+    },
+    "hyperlink": {
+        "enabled": "Enable auto hyperlink",
+        "enabledDesc": "When pasting a URL, automatically convert it to a Markdown link.",
+        "timeout": "Fetch timeout (ms)",
+        "timeoutDesc": "Maximum time to wait for page title fetch. Range: 1000–60000.",
+        "skipPrivate": "Skip private hosts",
+        "skipPrivateDesc": "Do not fetch titles for localhost or private IP addresses.",
+        "userAgent": "User agent",
+        "userAgentDesc": "User-Agent header sent when fetching page titles.",
+        "excludedDomains": "Excluded domains",
+        "excludedDomainsDesc": "Domains to skip (comma-separated). Supports wildcards: *.example.com"
+    }
+}

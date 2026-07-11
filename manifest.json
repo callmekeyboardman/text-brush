@@ -1,7 +1,7 @@
 {
   "id": "text-brush",
   "name": "Text Brush",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "minAppVersion": "1.4.0",
   "description": "Right-click selected text in the editor to apply color, font size, or bold from a configurable palette.",
   "author": "shimengjie",

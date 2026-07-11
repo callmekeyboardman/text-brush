@@ -1,0 +1,60 @@
+{
+    "menu": {
+        "textColor": "Textfarbe",
+        "textSize": "Textgröße",
+        "bold": "Fett",
+        "clearColor": "Farbe entfernen",
+        "clearSize": "Größe entfernen"
+    },
+    "settingTab": {
+        "general": "Allgemein",
+        "colors": "Textfarbe",
+        "fonts": "Schriftart",
+        "hyperlink": "Hyperlink"
+    },
+    "language": {
+        "name": "Sprache",
+        "desc": "Anzeigesprache für das Kontextmenü und diesen Einstellungs-Tab."
+    },
+    "colors": {
+        "heading": "Textfarbe",
+        "desc": "Konfiguriert die im Kontextmenü verfügbaren Farben. Ein Wert kann eine CSS-Farbe (z. B. #ff0000) oder var(--…) für eine Theme-Variable sein.",
+        "valuePlaceholder": "CSS-Farbe oder var(--…)",
+        "add": "Farbe hinzufügen",
+        "newName": "Neue Farbe",
+        "names": {
+            "red": "Rot",
+            "orange": "Orange",
+            "yellow": "Gelb",
+            "green": "Grün",
+            "cyan": "Cyan",
+            "blue": "Blau",
+            "purple": "Lila",
+            "pink": "Rosa",
+            "gray": "Grau"
+        }
+    },
+    "sizes": {
+        "heading": "Textgröße",
+        "desc": "Konfiguriert die im Kontextmenü verfügbaren Schriftgrößen. Ein Wert kann jede CSS-Größe sein (z. B. 14px oder 1.2em).",
+        "valuePlaceholder": "CSS-Größe (z. B. 16px)",
+        "add": "Schriftgröße hinzufügen"
+    },
+    "shared": {
+        "displayNamePlaceholder": "Anzeigename",
+        "deleteTooltip": "Löschen",
+        "restoreDefaults": "Standard wiederherstellen"
+    },
+    "hyperlink": {
+        "enabled": "Auto-Hyperlink aktivieren",
+        "enabledDesc": "Beim Einfügen einer URL diese automatisch in einen Markdown-Link umwandeln.",
+        "timeout": "Abruf-Timeout (ms)",
+        "timeoutDesc": "Maximale Wartezeit für den Abruf des Seitentitels. Bereich: 1000–60000.",
+        "skipPrivate": "Private Hosts überspringen",
+        "skipPrivateDesc": "Keine Titel für localhost oder private IP-Adressen abrufen.",
+        "userAgent": "User-Agent",
+        "userAgentDesc": "User-Agent-Header, der beim Abrufen von Seitentiteln gesendet wird.",
+        "excludedDomains": "Ausgeschlossene Domains",
+        "excludedDomainsDesc": "Zu überspringende Domains (durch Kommas getrennt). Platzhalter unterstützt: *.example.com"
+    }
+}

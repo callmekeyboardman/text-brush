@@ -1,0 +1,60 @@
+{
+    "menu": {
+        "textColor": "文字顏色",
+        "textSize": "文字大小",
+        "bold": "粗體",
+        "clearColor": "清除顏色",
+        "clearSize": "清除大小"
+    },
+    "settingTab": {
+        "general": "一般",
+        "colors": "文字顏色",
+        "fonts": "字體",
+        "hyperlink": "超連結"
+    },
+    "language": {
+        "name": "語言",
+        "desc": "右鍵選單和本設定頁面的顯示語言。"
+    },
+    "colors": {
+        "heading": "文字顏色",
+        "desc": "設定右鍵選單中可選的顏色。值可以是 CSS 顏色（如 #ff0000）或 var(--…) 引用主題變數。",
+        "valuePlaceholder": "CSS 顏色或 var(--…)",
+        "add": "新增顏色",
+        "newName": "新顏色",
+        "names": {
+            "red": "紅色",
+            "orange": "橙色",
+            "yellow": "黃色",
+            "green": "綠色",
+            "cyan": "青色",
+            "blue": "藍色",
+            "purple": "紫色",
+            "pink": "粉紅色",
+            "gray": "灰色"
+        }
+    },
+    "sizes": {
+        "heading": "文字大小",
+        "desc": "設定右鍵選單中可選的字級。值可以是任意 CSS 大小（如 14px、1.2em）。",
+        "valuePlaceholder": "CSS 大小（如 16px）",
+        "add": "新增字級"
+    },
+    "shared": {
+        "displayNamePlaceholder": "顯示名稱",
+        "deleteTooltip": "刪除",
+        "restoreDefaults": "還原預設"
+    },
+    "hyperlink": {
+        "enabled": "啟用自動超連結",
+        "enabledDesc": "貼上 URL 時，自動轉換為 Markdown 連結格式。",
+        "timeout": "擷取逾時（毫秒）",
+        "timeoutDesc": "等待頁面標題擷取的最長時間，範圍 1000–60000。",
+        "skipPrivate": "略過私有位址",
+        "skipPrivateDesc": "不對 localhost 或私有 IP 位址發起標題擷取請求。",
+        "userAgent": "User-Agent",
+        "userAgentDesc": "擷取頁面標題時使用的 User-Agent 請求標頭。",
+        "excludedDomains": "排除網域",
+        "excludedDomainsDesc": "不進行標題擷取的網域（逗號分隔），支援萬用字元：*.example.com"
+    }
+}

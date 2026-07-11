@@ -1,0 +1,60 @@
+{
+    "menu": {
+        "textColor": "Couleur du texte",
+        "textSize": "Taille du texte",
+        "bold": "Gras",
+        "clearColor": "Effacer la couleur",
+        "clearSize": "Effacer la taille"
+    },
+    "settingTab": {
+        "general": "Général",
+        "colors": "Couleur du texte",
+        "fonts": "Police",
+        "hyperlink": "Lien hypertexte"
+    },
+    "language": {
+        "name": "Langue",
+        "desc": "Langue d'affichage du menu contextuel et de cet onglet de paramètres."
+    },
+    "colors": {
+        "heading": "Couleur du texte",
+        "desc": "Configure les couleurs disponibles dans le menu contextuel. Une valeur peut être une couleur CSS (ex. #ff0000) ou var(--…) pour référencer une variable de thème.",
+        "valuePlaceholder": "Couleur CSS ou var(--…)",
+        "add": "Ajouter une couleur",
+        "newName": "Nouvelle couleur",
+        "names": {
+            "red": "Rouge",
+            "orange": "Orange",
+            "yellow": "Jaune",
+            "green": "Vert",
+            "cyan": "Cyan",
+            "blue": "Bleu",
+            "purple": "Violet",
+            "pink": "Rose",
+            "gray": "Gris"
+        }
+    },
+    "sizes": {
+        "heading": "Taille du texte",
+        "desc": "Configure les tailles de police disponibles dans le menu contextuel. Une valeur peut être toute taille CSS (ex. 14px ou 1.2em).",
+        "valuePlaceholder": "Taille CSS (ex. 16px)",
+        "add": "Ajouter une taille de police"
+    },
+    "shared": {
+        "displayNamePlaceholder": "Nom d'affichage",
+        "deleteTooltip": "Supprimer",
+        "restoreDefaults": "Restaurer les valeurs par défaut"
+    },
+    "hyperlink": {
+        "enabled": "Activer les liens hypertextes automatiques",
+        "enabledDesc": "Lors du collage d'une URL, la convertir automatiquement en lien Markdown.",
+        "timeout": "Délai d'extraction (ms)",
+        "timeoutDesc": "Temps maximum d'attente pour l'extraction du titre de la page. Plage : 1000–60000.",
+        "skipPrivate": "Ignorer les hôtes privés",
+        "skipPrivateDesc": "Ne pas extraire les titres pour localhost ou les adresses IP privées.",
+        "userAgent": "User agent",
+        "userAgentDesc": "En-tête User-Agent envoyé lors de l'extraction des titres de page.",
+        "excludedDomains": "Domaines exclus",
+        "excludedDomainsDesc": "Domaines à ignorer (séparés par des virgules). Caractères génériques pris en charge : *.example.com"
+    }
+}

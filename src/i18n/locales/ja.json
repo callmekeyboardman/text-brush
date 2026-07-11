@@ -1,0 +1,60 @@
+{
+    "menu": {
+        "textColor": "文字色",
+        "textSize": "文字サイズ",
+        "bold": "太字",
+        "clearColor": "色をクリア",
+        "clearSize": "サイズをクリア"
+    },
+    "settingTab": {
+        "general": "一般",
+        "colors": "文字色",
+        "fonts": "フォント",
+        "hyperlink": "ハイパーリンク"
+    },
+    "language": {
+        "name": "言語",
+        "desc": "右クリックメニューとこの設定タブの表示言語。"
+    },
+    "colors": {
+        "heading": "文字色",
+        "desc": "右クリックメニューで選択可能な色を設定します。値には CSS 色（例: #ff0000）やテーマ変数を参照する var(--…) を指定できます。",
+        "valuePlaceholder": "CSS 色または var(--…)",
+        "add": "色を追加",
+        "newName": "新しい色",
+        "names": {
+            "red": "赤",
+            "orange": "オレンジ",
+            "yellow": "黄",
+            "green": "緑",
+            "cyan": "シアン",
+            "blue": "青",
+            "purple": "紫",
+            "pink": "ピンク",
+            "gray": "グレー"
+        }
+    },
+    "sizes": {
+        "heading": "文字サイズ",
+        "desc": "右クリックメニューで選択可能なフォントサイズを設定します。値には任意の CSS サイズ（例: 14px、1.2em）を指定できます。",
+        "valuePlaceholder": "CSS サイズ（例: 16px）",
+        "add": "フォントサイズを追加"
+    },
+    "shared": {
+        "displayNamePlaceholder": "表示名",
+        "deleteTooltip": "削除",
+        "restoreDefaults": "デフォルトに戻す"
+    },
+    "hyperlink": {
+        "enabled": "自動ハイパーリンクを有効化",
+        "enabledDesc": "URL を貼り付けた際、自動的に Markdown リンクに変換します。",
+        "timeout": "取得タイムアウト (ms)",
+        "timeoutDesc": "ページタイトルの取得を待つ最長時間。範囲: 1000–60000。",
+        "skipPrivate": "プライベートホストをスキップ",
+        "skipPrivateDesc": "localhost やプライベート IP アドレスのタイトルは取得しません。",
+        "userAgent": "ユーザーエージェント",
+        "userAgentDesc": "ページタイトル取得時に送信する User-Agent ヘッダー。",
+        "excludedDomains": "除外ドメイン",
+        "excludedDomainsDesc": "スキップするドメイン（カンマ区切り）。ワイルドカード対応: *.example.com"
+    }
+}

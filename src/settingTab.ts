@@ -1,7 +1,8 @@
 import { App, Setting, PluginSettingTab } from 'obsidian';
 import type TextColorPlugin from './main';
-import type { LangSetting, Translations } from './i18n';
-import { getTranslations, LANGUAGE_OPTIONS } from './i18n';
+import type { LangSetting, Locale } from './i18n/types';
+import { t } from './i18n/i18n';
+import { LANGUAGE_OPTIONS } from './i18n/constants';
 import { colorsAreBuiltinDefaults, getDefaultColors } from './types';
 import type { SettingsTabId } from './types';
 
@@ -33,7 +34,7 @@ export class TextColorSettingTab extends PluginSettingTab {
         containerEl.empty();
         containerEl.addClass('tb-settings');
 
-        const t = this.plugin.t;
+        const locale = this.plugin.locale;
 
         const tabBar = containerEl.createDiv({ cls: 'tb-settings-tabs' });
         const tabButtons = new Map<TabId, HTMLButtonElement>();
@@ -42,7 +43,7 @@ export class TextColorSettingTab extends PluginSettingTab {
         for (const id of TAB_IDS) {
             const btn = tabBar.createEl('button', {
                 cls: `tb-settings-tab${id === this.activeTab ? ' tb-settings-tab--active' : ''}`,
-                text: this.getTabLabel(id, t),
+                text: this.getTabLabel(id, locale),
             });
             btn.addEventListener('click', () => {
                 this.activeTab = id;
@@ -62,26 +63,26 @@ export class TextColorSettingTab extends PluginSettingTab {
             tabContents.set(id, content);
         }
 
-        this.renderGeneralTab(tabContents.get('general')!, t);
-        this.renderColorsTab(tabContents.get('colors')!, t);
-        this.renderFontsTab(tabContents.get('fonts')!, t);
-        this.renderHyperlinkTab(tabContents.get('hyperlink')!, t);
+        this.renderGeneralTab(tabContents.get('general')!, locale);
+        this.renderColorsTab(tabContents.get('colors')!, locale);
+        this.renderFontsTab(tabContents.get('fonts')!, locale);
+        this.renderHyperlinkTab(tabContents.get('hyperlink')!, locale);
     }
 
-    private getTabLabel(id: TabId, t: Translations): string {
+    private getTabLabel(id: TabId, locale: Locale): string {
         const map: Record<TabId, string> = {
-            general: t.settingTabGeneral,
-            colors: t.settingTabColors,
-            fonts: t.settingTabFonts,
-            hyperlink: t.settingTabHyperlink,
+            general: t('settingTab.general', locale),
+            colors: t('settingTab.colors', locale),
+            fonts: t('settingTab.fonts', locale),
+            hyperlink: t('settingTab.hyperlink', locale),
         };
         return map[id];
     }
 
-    private renderGeneralTab(container: HTMLElement, t: Translations): void {
+    private renderGeneralTab(container: HTMLElement, locale: Locale): void {
         new Setting(container)
-            .setName(t.settingLanguageName)
-            .setDesc(t.settingLanguageDesc)
+            .setName(t('language.name', locale))
+            .setDesc(t('language.desc', locale))
             .addDropdown((dd) => {
                 for (const opt of LANGUAGE_OPTIONS) dd.addOption(opt.value, opt.label);
                 dd.setValue(this.plugin.settings.language);
@@ -90,9 +91,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                     // If the palette is still the untouched built-in set, follow
                     // the new language; otherwise leave the user's names alone.
                     if (colorsAreBuiltinDefaults(this.plugin.settings.colors)) {
-                        this.plugin.settings.colors = getDefaultColors(
-                            getTranslations(this.plugin.settings.language),
-                        );
+                        this.plugin.settings.colors = getDefaultColors(this.plugin.settings.language);
                     }
                     await this.plugin.saveSettings();
                     this.display();
@@ -100,9 +99,9 @@ export class TextColorSettingTab extends PluginSettingTab {
             });
     }
 
-    private renderColorsTab(container: HTMLElement, t: Translations): void {
-        new Setting(container).setName(t.settingColorsHeading).setHeading();
-        new Setting(container).setDesc(t.settingColorsDesc);
+    private renderColorsTab(container: HTMLElement, locale: Locale): void {
+        new Setting(container).setName(t('colors.heading', locale)).setHeading();
+        new Setting(container).setDesc(t('colors.desc', locale));
 
         this.plugin.settings.colors.forEach((color, idx) => {
             const setting = new Setting(container);
@@ -113,7 +112,7 @@ export class TextColorSettingTab extends PluginSettingTab {
             setting
                 .addText((text) =>
                     text
-                        .setPlaceholder(t.settingDisplayNamePlaceholder)
+                        .setPlaceholder(t('shared.displayNamePlaceholder', locale))
                         .setValue(color.name)
                         .onChange(async (v) => {
                             this.plugin.settings.colors[idx].name = v;
@@ -122,7 +121,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 )
                 .addText((text) =>
                     text
-                        .setPlaceholder(t.settingColorValuePlaceholder)
+                        .setPlaceholder(t('colors.valuePlaceholder', locale))
                         .setValue(color.value)
                         .onChange(async (v) => {
                             this.plugin.settings.colors[idx].value = v;
@@ -133,7 +132,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 .addExtraButton((btn) =>
                     btn
                         .setIcon('trash')
-                        .setTooltip(t.settingDeleteTooltip)
+                        .setTooltip(t('shared.deleteTooltip', locale))
                         .onClick(async () => {
                             this.plugin.settings.colors.splice(idx, 1);
                             await this.plugin.saveSettings();
@@ -145,13 +144,13 @@ export class TextColorSettingTab extends PluginSettingTab {
         new Setting(container)
             .addButton((btn) =>
                 btn
-                    .setButtonText(t.settingAddColor)
+                    .setButtonText(t('colors.add', locale))
                     .setCta()
                     .onClick(async () => {
                         const id = `custom-${Date.now().toString(36)}`;
                         this.plugin.settings.colors.push({
                             id,
-                            name: t.newColorName,
+                            name: t('colors.newName', locale),
                             value: '#888888',
                         });
                         await this.plugin.saveSettings();
@@ -160,7 +159,7 @@ export class TextColorSettingTab extends PluginSettingTab {
             )
             .addButton((btn) =>
                 btn
-                    .setButtonText(t.settingRestoreDefaults)
+                    .setButtonText(t('shared.restoreDefaults', locale))
                     .setWarning()
                     .onClick(async () => {
                         this.plugin.resetColors();
@@ -170,9 +169,9 @@ export class TextColorSettingTab extends PluginSettingTab {
             );
     }
 
-    private renderFontsTab(container: HTMLElement, t: Translations): void {
-        new Setting(container).setName(t.settingSizesHeading).setHeading();
-        new Setting(container).setDesc(t.settingSizesDesc);
+    private renderFontsTab(container: HTMLElement, locale: Locale): void {
+        new Setting(container).setName(t('sizes.heading', locale)).setHeading();
+        new Setting(container).setDesc(t('sizes.desc', locale));
 
         this.plugin.settings.fontSizes.forEach((size, idx) => {
             const setting = new Setting(container);
@@ -180,7 +179,7 @@ export class TextColorSettingTab extends PluginSettingTab {
             setting
                 .addText((text) =>
                     text
-                        .setPlaceholder(t.settingDisplayNamePlaceholder)
+                        .setPlaceholder(t('shared.displayNamePlaceholder', locale))
                         .setValue(size.label)
                         .onChange(async (v) => {
                             this.plugin.settings.fontSizes[idx].label = v;
@@ -189,7 +188,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 )
                 .addText((text) =>
                     text
-                        .setPlaceholder(t.settingSizeValuePlaceholder)
+                        .setPlaceholder(t('sizes.valuePlaceholder', locale))
                         .setValue(size.value)
                         .onChange(async (v) => {
                             this.plugin.settings.fontSizes[idx].value = v;
@@ -199,7 +198,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 .addExtraButton((btn) =>
                     btn
                         .setIcon('trash')
-                        .setTooltip(t.settingDeleteTooltip)
+                        .setTooltip(t('shared.deleteTooltip', locale))
                         .onClick(async () => {
                             this.plugin.settings.fontSizes.splice(idx, 1);
                             await this.plugin.saveSettings();
@@ -211,7 +210,7 @@ export class TextColorSettingTab extends PluginSettingTab {
         new Setting(container)
             .addButton((btn) =>
                 btn
-                    .setButtonText(t.settingAddSize)
+                    .setButtonText(t('sizes.add', locale))
                     .setCta()
                     .onClick(async () => {
                         this.plugin.settings.fontSizes.push({
@@ -224,7 +223,7 @@ export class TextColorSettingTab extends PluginSettingTab {
             )
             .addButton((btn) =>
                 btn
-                    .setButtonText(t.settingRestoreDefaults)
+                    .setButtonText(t('shared.restoreDefaults', locale))
                     .setWarning()
                     .onClick(async () => {
                         this.plugin.resetFontSizes();
@@ -234,12 +233,12 @@ export class TextColorSettingTab extends PluginSettingTab {
             );
     }
 
-    private renderHyperlinkTab(container: HTMLElement, t: Translations): void {
+    private renderHyperlinkTab(container: HTMLElement, locale: Locale): void {
         const h = this.plugin.settings.hyperlink;
 
         new Setting(container)
-            .setName(t.hyperlinkEnabled)
-            .setDesc(t.hyperlinkEnabledDesc)
+            .setName(t('hyperlink.enabled', locale))
+            .setDesc(t('hyperlink.enabledDesc', locale))
             .addToggle((toggle) =>
                 toggle
                     .setValue(h.enabled)
@@ -250,8 +249,8 @@ export class TextColorSettingTab extends PluginSettingTab {
             );
 
         new Setting(container)
-            .setName(t.hyperlinkTimeout)
-            .setDesc(t.hyperlinkTimeoutDesc)
+            .setName(t('hyperlink.timeout', locale))
+            .setDesc(t('hyperlink.timeoutDesc', locale))
             .addText((text) =>
                 text
                     .setValue(String(h.timeoutMs))
@@ -264,8 +263,8 @@ export class TextColorSettingTab extends PluginSettingTab {
             );
 
         new Setting(container)
-            .setName(t.hyperlinkSkipPrivate)
-            .setDesc(t.hyperlinkSkipPrivateDesc)
+            .setName(t('hyperlink.skipPrivate', locale))
+            .setDesc(t('hyperlink.skipPrivateDesc', locale))
             .addToggle((toggle) =>
                 toggle
                     .setValue(h.skipPrivateHosts)
@@ -276,8 +275,8 @@ export class TextColorSettingTab extends PluginSettingTab {
             );
 
         new Setting(container)
-            .setName(t.hyperlinkUserAgent)
-            .setDesc(t.hyperlinkUserAgentDesc)
+            .setName(t('hyperlink.userAgent', locale))
+            .setDesc(t('hyperlink.userAgentDesc', locale))
             .addText((text) =>
                 text
                     .setPlaceholder('Mozilla/5.0 ...')
@@ -289,8 +288,8 @@ export class TextColorSettingTab extends PluginSettingTab {
             );
 
         new Setting(container)
-            .setName(t.hyperlinkExcludedDomains)
-            .setDesc(t.hyperlinkExcludedDomainsDesc)
+            .setName(t('hyperlink.excludedDomains', locale))
+            .setDesc(t('hyperlink.excludedDomainsDesc', locale))
             .addTextArea((area) =>
                 area
                     .setPlaceholder('example.com, *.ads.com')

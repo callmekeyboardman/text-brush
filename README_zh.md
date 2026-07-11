@@ -36,7 +36,7 @@
 
 - **版本兼容** — 自动检测 Obsidian 是否支持子菜单，不支持时退化为扁平菜单
 - **智能选区处理** — 当选区与已有的着色 span 部分重叠时（从 span 外选到 span 内，或反向，含跨行情况），替换范围会自动扩展到覆盖整个 span，绝不会留下残缺的 `<span>` 标签碎片
-- **多语言界面** — 右键菜单与设置页支持中文和英文。设置页提供**语言**选择器（Auto / English / 中文）可手动切换；**Auto** 跟随 Obsidian 的界面语言，无法识别时回退英文。内置颜色名称也会随语言翻译；切换语言时，仅当调色板仍为未修改的默认值才会重新翻译，用户的自定义内容不会被覆盖。
+- **多语言界面** — 右键菜单与设置页支持 10 种语言：English、简体中文、繁體中文、日本語、한국어、Deutsch、Français、Español、Русский、Português。设置页提供**语言**选择器可手动切换；**Auto** 跟随 Obsidian 的界面语言，无法识别时回退英文。内置颜色名称也会随语言翻译；切换语言时，仅当调色板仍为未修改的默认值才会重新翻译，用户的自定义内容不会被覆盖。
 
 ## 默认调色板
 
@@ -101,7 +101,7 @@
 设置页面分为四个 Tab，且会记住上次打开的 Tab，下次进入时自动恢复：
 
 ### 通用
-- **语言** — 选择右键菜单和设置页的显示语言：**Auto**（跟随 Obsidian，无法识别时回退英文）、**English** 或 **中文**
+- **语言** — 选择右键菜单和设置页的显示语言：**Auto**（跟随 Obsidian，无法识别时回退英文）或 10 种支持语言之一（English、简体中文、繁體中文、日本語、한국어、Deutsch、Français、Español、Русский、Português）
 
 ### 文字颜色
 - 修改每个颜色的显示名称和 CSS 值
@@ -150,7 +150,11 @@ npm run build    # 类型检查 + 生产构建
 src/
 ├── main.ts             # 插件主类（菜单构建、选区解析、文档操作、粘贴处理器注册）
 ├── types.ts            # 接口、常量、正则、工具函数
-├── i18n.ts             # 自包含的 i18n 层（翻译表、语言检测）
+├── i18n/               # i18n 层（t() 函数、语言解析、翻译 JSON 文件）
+│   ├── i18n.ts         #   t(key, locale) 函数、resolveLang、英文回退
+│   ├── types.ts        #   Locale / TranslationKey 类型（key 从 en.json 推导）
+│   ├── constants.ts    #   SUPPORTED_LOCALES 元数据、LANGUAGE_OPTIONS
+│   └── locales/        #   每种语言一个 JSON（en, zh-CN, zh-TW, ja, ko, de, fr, es, ru, pt）
 ├── hyperlinkPaste.ts   # 粘贴自动超链接（URL→Markdown 链接、标题抓取）
 └── settingTab.ts       # 设置页 UI
 styles.css              # 颜色 class 定义 + 菜单色块样式

@@ -24,6 +24,8 @@
 | `src/hyperlinkPaste.ts` | **新建** | 所有 URL/网络工具函数 + 粘贴处理类 |
 | `src/types.ts` | **修改** | 新增 `HyperlinkSettings` 接口；扩展 `TextColorSettings` 和 `SettingsTabId` |
 | `src/i18n.ts` | **修改** | 新增 Hyperlink 相关翻译键 |
+
+> ℹ️ **i18n 层后续已重构**（2026-07-11）：`src/i18n.ts` 已拆分为 `src/i18n/` 目录（10 语言 JSON + `t(key, locale)` 函数模式），Hyperlink 相关键现位于 `src/i18n/locales/*.json` 的 `hyperlink.*` 命名空间下。详见 [知识卡片-7-多语言架构.md](知识卡片-7-多语言架构.md)。本表中其余文件（`hyperlinkPaste.ts`/`types.ts`/`main.ts`/`settingTab.ts`）的变更不受影响。
 | `src/main.ts` | **修改** | 注册粘贴事件处理器；接入 `onunload` |
 | `src/settingTab.ts` | **修改** | 新增第四个 Tab：Hyperlink 设置 |
 
@@ -216,6 +218,8 @@ hyperlink: {
 ---
 
 ### 3.3 修改文件：`src/i18n.ts`
+
+> ⚠️ **已迁移**（2026-07-11）：i18n 层后已重构为 `src/i18n/` 目录 + `t(key, locale)` 函数模式（详见 [知识卡片-7-多语言架构.md](知识卡片-7-多语言架构.md)）。下方 `Translations` 接口、`t.hyperlinkEnabled` 对象访问、`this.plugin.t` getter 的写法均为**本方案实施时的原始设计**，保留作历史记录。重构后等价写法：JSON 中 `hyperlink.enabled` / `hyperlink.enabledDesc` 等键，调用处 `t('hyperlink.enabled', locale)`；`this.plugin.t` getter 已改为 `this.plugin.locale`。
 
 #### 3.3.1 修改 `Translations` 接口
 

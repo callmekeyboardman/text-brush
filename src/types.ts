@@ -1,7 +1,8 @@
 import { EditorPosition } from 'obsidian';
 
-import type { LangSetting, Translations } from './i18n';
-import { SUPPORTED_LANGS, TRANSLATIONS } from './i18n';
+import type { LangSetting } from './i18n/types';
+import { getColorName } from './i18n/i18n';
+import { SUPPORTED_LOCALE_CODES } from './i18n/constants';
 
 export interface ColorOption {
     /** Stable identifier, used as part of the CSS class name */
@@ -75,11 +76,11 @@ export const DEFAULT_COLOR_DEFS: { id: string; value: string }[] = [
 ];
 
 /** Build the default color palette with names in the given language. */
-export function getDefaultColors(t: Translations): ColorOption[] {
+export function getDefaultColors(setting: LangSetting): ColorOption[] {
     return DEFAULT_COLOR_DEFS.map((def) => ({
         id: def.id,
         value: def.value,
-        name: t.colorNames[def.id] ?? def.id,
+        name: getColorName(def.id, setting),
     }));
 }
 
@@ -94,13 +95,13 @@ export function colorsAreBuiltinDefaults(colors: ColorOption[]): boolean {
     return colors.every((color, i) => {
         const def = DEFAULT_COLOR_DEFS[i];
         if (color.id !== def.id || color.value !== def.value) return false;
-        return SUPPORTED_LANGS.some((lang) => TRANSLATIONS[lang].colorNames[def.id] === color.name);
+        return SUPPORTED_LOCALE_CODES.some((locale) => getColorName(def.id, locale as LangSetting) === color.name);
     });
 }
 
 export const DEFAULT_SETTINGS: TextColorSettings = {
     language: 'auto',
-    colors: getDefaultColors(TRANSLATIONS.en),
+    colors: getDefaultColors('en'),
     fontSizes: DEFAULT_FONT_SIZES,
     activeSettingsTab: 'general',
     hyperlink: {
