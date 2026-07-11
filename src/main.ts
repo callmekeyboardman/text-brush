@@ -13,6 +13,7 @@ import {
     OPEN_TAG_RE,
     CLOSE_TAG_RE,
     SPAN_IN_LINE_RE,
+    SPAN_IN_BLOCK_RE,
     unwrap,
     unwrapBold,
     wrapBold,
@@ -185,7 +186,67 @@ export default class TextColorPlugin extends Plugin {
             }
         }
 
+        // Selection partially overlaps a span (starts outside, ends inside, or
+        // vice versa; possibly across lines). Expand the replace range to cover
+        // the whole span so no tag fragments are left behind when re-wrapping.
+        const expanded = this.expandToOverlappingSpan(editor, from, to);
+        if (expanded) {
+            return { inner: expanded.inner, from: expanded.from, to: expanded.to, wrapped: true };
+        }
+
         return { inner: selection, from, to, wrapped: false };
+    }
+
+    /**
+     * If the selection partially overlaps a tc-color span, return that span's
+     * full range (and its inner text) so the caller can replace the whole span
+     * instead of leaving tag fragments behind. Returns null when there is no
+     * overlap. `block` starts at `from.line`, so selection offsets are taken
+     * relative to that line.
+     */
+    private expandToOverlappingSpan(
+        editor: Editor,
+        from: EditorPosition,
+        to: EditorPosition,
+    ): { inner: string; from: EditorPosition; to: EditorPosition } | null {
+        const lines: string[] = [];
+        for (let l = from.line; l <= to.line; l++) lines.push(editor.getLine(l));
+        const block = lines.join('\n');
+
+        // Selection char offsets relative to `block` (which starts at from.line).
+        const selStart = from.ch;
+        let selEnd = 0;
+        for (let l = from.line; l < to.line; l++) {
+            selEnd += editor.getLine(l).length + 1; // +1 for '\n'
+        }
+        selEnd += to.ch;
+
+        SPAN_IN_BLOCK_RE.lastIndex = 0;
+        let m: RegExpExecArray | null;
+        while ((m = SPAN_IN_BLOCK_RE.exec(block)) !== null) {
+            const spanStart = m.index;
+            const spanEnd = m.index + m[0].length;
+            if (selStart < spanEnd && selEnd > spanStart) {
+                return {
+                    inner: m[2],
+                    from: this.offsetToPos(editor, from.line, spanStart),
+                    to: this.offsetToPos(editor, from.line, spanEnd),
+                };
+            }
+        }
+        return null;
+    }
+
+    /** Convert a char offset (relative to `startLine`) back into an editor position. */
+    private offsetToPos(editor: Editor, startLine: number, offset: number): EditorPosition {
+        let line = startLine;
+        let remaining = offset;
+        while (true) {
+            const lineLen = editor.getLine(line).length;
+            if (remaining <= lineLen) return { line, ch: remaining };
+            remaining -= lineLen + 1; // +1 for '\n'
+            line++;
+        }
     }
 
     private populateColorMenu(menu: Menu, editor: Editor, target: ResolvedTarget) {
@@ -302,7 +363,7 @@ export default class TextColorPlugin extends Plugin {
         const endCh =
             lines.length === 1
                 ? from.ch + inserted.length
-                : lines[lines.length - 1].length;
+                : from.ch + lines[lines.length - 1].length;
         editor.setSelection(from, { line: endLine, ch: endCh });
     }
     

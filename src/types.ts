@@ -16,7 +16,12 @@ export interface TextColorSettings {
     language: LangSetting;
     colors: ColorOption[];
     fontSizes: FontSizeOption[];
+    /** Last-opened settings tab, remembered across sessions. */
+    activeSettingsTab: SettingsTabId;
 }
+
+/** Valid settings-tab identifiers. Mirrors `TAB_IDS` in settingTab.ts. */
+export type SettingsTabId = 'general' | 'colors' | 'fonts';
 
 export interface FontSizeOption {
     label: string;
@@ -87,6 +92,7 @@ export const DEFAULT_SETTINGS: TextColorSettings = {
     language: 'auto',
     colors: getDefaultColors(TRANSLATIONS.en),
     fontSizes: DEFAULT_FONT_SIZES,
+    activeSettingsTab: 'general',
 };
 
 // Match a single span produced by this plugin. Captures the color id and
@@ -106,6 +112,12 @@ export const CLOSE_TAG_RE = /^<\/span>/;
 // Non-anchored, non-greedy variant for scanning a full line to find which
 // span (if any) the cursor/selection falls inside.
 export const SPAN_IN_LINE_RE =
+    /<span class="tc-color tc-color--([\w-]+)"(?:\s+style="[^"]*")?>([\s\S]*?)<\/span>/g;
+
+// Same shape as SPAN_IN_LINE_RE, used to scan a (possibly multi-line) text block
+// for a span that a selection partially overlaps — so the replace range can be
+// expanded to cover the whole span and leave no tag fragments behind.
+export const SPAN_IN_BLOCK_RE =
     /<span class="tc-color tc-color--([\w-]+)"(?:\s+style="[^"]*")?>([\s\S]*?)<\/span>/g;
 
 export function unwrap(text: string): { inner: string; wrapped: boolean; colorId?: string } {

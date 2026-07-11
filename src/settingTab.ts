@@ -1,8 +1,14 @@
 import { App, Setting, PluginSettingTab } from 'obsidian';
 import type TextColorPlugin from './main';
-import type { LangSetting } from './i18n';
+import type { LangSetting, Translations } from './i18n';
 import { getTranslations, LANGUAGE_OPTIONS } from './i18n';
 import { colorsAreBuiltinDefaults, getDefaultColors } from './types';
+import type { SettingsTabId } from './types';
+
+type TabId = SettingsTabId;
+
+/** Tab order on the settings page. Append a new id here to add a tab. */
+const TAB_IDS: TabId[] = ['general', 'colors', 'fonts'];
 
 export class TextColorSettingTab extends PluginSettingTab {
     plugin: TextColorPlugin;
@@ -12,13 +18,66 @@ export class TextColorSettingTab extends PluginSettingTab {
         this.plugin = plugin;
     }
 
+    /** Active tab, persisted in settings so it survives reopening the page. */
+    private get activeTab(): TabId {
+        const stored = this.plugin.settings.activeSettingsTab;
+        return TAB_IDS.includes(stored) ? stored : 'general';
+    }
+
+    private set activeTab(id: TabId) {
+        this.plugin.settings.activeSettingsTab = id;
+    }
+
     display(): void {
         const { containerEl } = this;
         containerEl.empty();
+        containerEl.addClass('tb-settings');
 
         const t = this.plugin.t;
 
-        new Setting(containerEl)
+        const tabBar = containerEl.createDiv({ cls: 'tb-settings-tabs' });
+        const tabButtons = new Map<TabId, HTMLButtonElement>();
+        const tabContents = new Map<TabId, HTMLDivElement>();
+
+        for (const id of TAB_IDS) {
+            const btn = tabBar.createEl('button', {
+                cls: `tb-settings-tab${id === this.activeTab ? ' tb-settings-tab--active' : ''}`,
+                text: this.getTabLabel(id, t),
+            });
+            btn.addEventListener('click', () => {
+                this.activeTab = id;
+                void this.plugin.saveSettings();
+                for (const tabId of TAB_IDS) {
+                    tabButtons.get(tabId)?.toggleClass('tb-settings-tab--active', tabId === id);
+                    tabContents.get(tabId)?.toggleClass('tb-settings-tab-content--active', tabId === id);
+                }
+            });
+            tabButtons.set(id, btn);
+        }
+
+        for (const id of TAB_IDS) {
+            const content = containerEl.createDiv({
+                cls: `tb-settings-tab-content${id === this.activeTab ? ' tb-settings-tab-content--active' : ''}`,
+            });
+            tabContents.set(id, content);
+        }
+
+        this.renderGeneralTab(tabContents.get('general')!, t);
+        this.renderColorsTab(tabContents.get('colors')!, t);
+        this.renderFontsTab(tabContents.get('fonts')!, t);
+    }
+
+    private getTabLabel(id: TabId, t: Translations): string {
+        const map: Record<TabId, string> = {
+            general: t.settingTabGeneral,
+            colors: t.settingTabColors,
+            fonts: t.settingTabFonts,
+        };
+        return map[id];
+    }
+
+    private renderGeneralTab(container: HTMLElement, t: Translations): void {
+        new Setting(container)
             .setName(t.settingLanguageName)
             .setDesc(t.settingLanguageDesc)
             .addDropdown((dd) => {
@@ -37,12 +96,14 @@ export class TextColorSettingTab extends PluginSettingTab {
                     this.display();
                 });
             });
+    }
 
-        new Setting(containerEl).setName(t.settingColorsHeading).setHeading();
-        new Setting(containerEl).setDesc(t.settingColorsDesc);
+    private renderColorsTab(container: HTMLElement, t: Translations): void {
+        new Setting(container).setName(t.settingColorsHeading).setHeading();
+        new Setting(container).setDesc(t.settingColorsDesc);
 
         this.plugin.settings.colors.forEach((color, idx) => {
-            const setting = new Setting(containerEl);
+            const setting = new Setting(container);
 
             const swatch = setting.nameEl.createSpan({ cls: 'tc-menu-swatch' });
             swatch.style.backgroundColor = color.value;
@@ -79,7 +140,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 );
         });
 
-        new Setting(containerEl)
+        new Setting(container)
             .addButton((btn) =>
                 btn
                     .setButtonText(t.settingAddColor)
@@ -105,12 +166,14 @@ export class TextColorSettingTab extends PluginSettingTab {
                         this.display();
                     }),
             );
+    }
 
-        new Setting(containerEl).setName(t.settingSizesHeading).setHeading();
-        new Setting(containerEl).setDesc(t.settingSizesDesc);
+    private renderFontsTab(container: HTMLElement, t: Translations): void {
+        new Setting(container).setName(t.settingSizesHeading).setHeading();
+        new Setting(container).setDesc(t.settingSizesDesc);
 
         this.plugin.settings.fontSizes.forEach((size, idx) => {
-            const setting = new Setting(containerEl);
+            const setting = new Setting(container);
 
             setting
                 .addText((text) =>
@@ -143,7 +206,7 @@ export class TextColorSettingTab extends PluginSettingTab {
                 );
         });
 
-        new Setting(containerEl)
+        new Setting(container)
             .addButton((btn) =>
                 btn
                     .setButtonText(t.settingAddSize)

@@ -79,6 +79,8 @@ declare module 'obsidian' {
 | `detectSubmenuSupport()` | 运行时探测 `MenuItem.setSubmenu` 是否可用 |
 | `buildMenu()` | 收到右键事件后构建菜单结构（颜色 + 字号，子菜单或扁平菜单） |
 | `resolveTarget()` | **核心逻辑** — 分析选区，确定实际要操作的文档范围 |
+| `expandToOverlappingSpan()` | 选区与某 span 部分重叠时，把范围扩边到覆盖整个 span（含跨行） |
+| `offsetToPos()` | 字符偏移量转回编辑器行列坐标（供扩边逻辑使用） |
 | `populateColorMenu()` | 向菜单填充颜色选项 + 加粗 + 清除颜色 |
 | `populateFontSizeMenu()` | 向菜单填充字号选项 + 清除大小 |
 | `applyColor()` | 用 `wrap()` 包裹文字并替换文档内容 |
@@ -206,7 +208,7 @@ this.registerEvent(
 
 **插件最核心的方法。** 返回 null 表示无有效选区（空或纯空白）。
 
-处理四种情况：
+处理五种情况：
 
 ```
 情况 1：选区本身就是完整的 tc-color span
@@ -217,11 +219,18 @@ this.registerEvent(
   文档内容: ...<span class="tc-color tc-color--red" style="...">hello</span>...
   选区范围: hello
   → 用 OPEN_TAG_RE / CLOSE_TAG_RE 检测，向左右扩展将标签纳入替换范围
+  （支持跨行：选区覆盖多行 inner 文本、首行前有开标签、末行后有闭标签时同样命中）
 
 情况 2.5：选区在 span 内部但非紧邻标签（选中了部分文字）
   文档内容: ...<span class="tc-color tc-color--red" style="...">浙江省中医院体检</span>...
   选区范围: 中医
   → 用 SPAN_IN_LINE_RE 扫描整行，找到包含选区的 span，返回整个 span 范围
+
+情况 2.6：选区与 span 部分重叠（从 span 外选到 span 内，或反向；含跨行）
+  文档内容: prefix <span class="tc-color tc-color--red" style="...">hello world</span> suffix
+  选区范围: ix <span...>hel   ← 从 span 外的 "ix" 选到 span 内的 "hel"
+  → 用 expandToOverlappingSpan() 扫描选区覆盖的行块，找到相交的 span，
+     把替换范围扩边到整个 span，避免 wrap 后留下半个标签碎片
 
 情况 3：选区是普通文本
   → 直接包裹，wrapped = false
@@ -247,7 +256,12 @@ this.registerEvent(
       └─ 选区 [from.ch, to.ch] 落在某个 span 的内容区间内
          → return { inner: span内全部文字, from: span起点, to: span终点, wrapped: true }
 
-5. 以上都不满足
+5. expandToOverlappingSpan(editor, from, to)
+   └─ 选区与某个 span 部分重叠（含跨行）
+      → 扩边到该 span 的完整范围
+      → return { inner: span内全部文字, 扩边后的from/to, wrapped: true }
+
+6. 以上都不满足
    → return { inner: 选区原文, from, to, wrapped: false }
 ```
 
@@ -256,6 +270,21 @@ this.registerEvent(
 - `innerEnd` = `</span>` 之前的位置（span 内容结束）
 - 判断条件：`from.ch >= innerStart && to.ch <= innerEnd`
 - 返回的 `inner` 是 span 内**全部**文字（不仅仅是用户选中的部分），后续操作（换色/清除）针对整个 span
+
+**情况 2.6 的关键计算（`expandToOverlappingSpan()`）：**
+
+前三种情况都要求选区"完全在 span 内部"或"恰好覆盖 inner 文本"。但用户实际操作时常会从 span 外部选到 span 内部（或反向），此时选区与 span **部分重叠**——若落到情况 3 直接包裹，`stripColorSpans` 只清理完整 span，对残片（半个开/闭标签）原样保留，`wrap` 后会生成未闭合或嵌套错乱的 span。
+
+`expandToOverlappingSpan()` 解决此问题：
+
+1. 取选区覆盖的行范围（`from.line` 到 `to.line`），用 `editor.getLine()` 逐行拼成 `block`（行间补 `\n`）
+2. 把选区起止换算成 `block` 内的字符偏移 `selStart`/`selEnd`（`block` 起点即 `from.line`，故 `selStart = from.ch`；`selEnd` 累加各整行长度 + 换行符）
+3. 用 `SPAN_IN_BLOCK_RE` 遍历 `block` 中所有 span，判断 `selStart < spanEnd && selEnd > spanStart`（区间相交）
+4. 命中即把 `from`/`to` 扩边到该 span 的完整范围，`inner` 设为 span 全部内容，`wrapped = true`
+
+`offsetToPos()` 把扩边后的字符偏移转回 `{ line, ch }`：逐行扣减行长 + 换行符，直到剩余量落在某行长度内。偏移来自正则匹配位置，必在 `block` 范围内，循环必然返回。
+
+> ⚠️ **已知边界**：当选区同时跨越多个 span 时，本方法只扩边到第一个相交 span。中间完整的 span 会被 `applyColor` 的 `stripColorSpans` 清理，但被选区边缘截断的最后一个 span 仍可能残留半个标签。详见 [知识卡片-5-遗留问题记录.md](知识卡片-5-遗留问题记录.md)。
 
 ### populateColorMenu()
 
@@ -314,6 +343,12 @@ this.registerEvent(
 
 替换文本后重新计算选区终点并调用 `editor.setSelection()`，让用户操作后文字保持选中状态，方便连续操作。
 
+**末列计算：**
+- 单行：`endCh = from.ch + inserted.length`
+- 多行：`endCh = from.ch + lines[末行].length` —— 末行偏移必须加上 `from.ch`，因为替换起点未必在行首
+
+> ⚠️ 多行分支的 `from.ch` 加法是修复项。早期版本写成 `lines[末行].length`，当 `from.ch !== 0`（替换起点不在行首）时末列会偏左，导致选区末尾停在错误位置。从行首替换时碰巧正确，所以长期未被发现。
+
 ---
 
 ## 完整调用关系图
@@ -326,7 +361,10 @@ onload()
   │                                      ├── resolveTarget()
   │                                      │     ├── unwrap()              [types.ts]
   │                                      │     ├── OPEN_TAG_RE / CLOSE_TAG_RE
-  │                                      │     └── SPAN_IN_LINE_RE       [types.ts]
+  │                                      │     ├── SPAN_IN_LINE_RE       [types.ts]
+  │                                      │     └── expandToOverlappingSpan()
+  │                                      │           ├── SPAN_IN_BLOCK_RE [types.ts]
+  │                                      │           └── offsetToPos()
   │                                      ├── populateColorMenu()
   │                                      │     ├── createColorTitle()    [types.ts]
   │                                      │     ├── applyColor()

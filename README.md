@@ -27,6 +27,7 @@ An Obsidian plugin that lets you quickly apply, switch, or clear text color and 
 ### General
 
 - **Version compatible** — Automatically detects whether Obsidian supports submenus; falls back to a flat menu if not
+- **Smart selection handling** — When a selection partially overlaps an existing colored span (starts outside, ends inside, or vice versa — including across lines), the replace range auto-expands to cover the whole span, so no broken `<span>` fragments are ever left behind
 - **Multilingual UI** — The right-click menu and settings tab are available in English and Chinese. A **Language** selector (Auto / English / 中文) in Settings lets you override the language; **Auto** follows Obsidian's own UI language and falls back to English. Built-in color names are translated to match, and switching language re-translates the default palette only while it is still untouched — your customizations are never overwritten.
 
 ## Default Palette
@@ -93,18 +94,18 @@ Applying only 16px font size to plain text:
 
 ## Settings
 
-Go to **Settings → text-brush** to:
+The settings page is organized into three tabs, and the last-opened tab is remembered across sessions:
 
-### Language
-- Choose the display language for the right-click menu and settings tab: **Auto** (follow Obsidian, fall back to English), **English**, or **中文**
+### General
+- **Language** — Choose the display language for the right-click menu and settings tab: **Auto** (follow Obsidian, fall back to English), **English**, or **中文**
 
-### Color Settings
+### Text Color
 - Edit the display name and CSS value for each color
 - Remove colors you don't need
 - Click "Add color" to add a custom color
 - Click "Restore defaults" to reset to the default palette
 
-### Font Size Settings
+### Font
 - Edit the display name and CSS value for each size
 - Remove sizes you don't need
 - Click "Add size" to add a custom size

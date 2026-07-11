@@ -24,6 +24,11 @@ export interface Translations {
     menuClearColor: string;
     menuClearSize: string;
 
+    // Settings — tab labels
+    settingTabGeneral: string;
+    settingTabColors: string;
+    settingTabFonts: string;
+
     // Settings — language selector
     settingLanguageName: string;
     settingLanguageDesc: string;
@@ -58,6 +63,10 @@ export const TRANSLATIONS: Record<Lang, Translations> = {
         menuBold: 'Bold',
         menuClearColor: 'Clear color',
         menuClearSize: 'Clear size',
+
+        settingTabGeneral: 'General',
+        settingTabColors: 'Text Color',
+        settingTabFonts: 'Font',
 
         settingLanguageName: 'Language',
         settingLanguageDesc: 'Display language for the right-click menu and this settings tab.',
@@ -97,6 +106,10 @@ export const TRANSLATIONS: Record<Lang, Translations> = {
         menuBold: '加粗',
         menuClearColor: '清除颜色',
         menuClearSize: '清除大小',
+
+        settingTabGeneral: '通用',
+        settingTabColors: '文字颜色',
+        settingTabFonts: '字体',
 
         settingLanguageName: '语言',
         settingLanguageDesc: '右键菜单和本设置页面的显示语言。',

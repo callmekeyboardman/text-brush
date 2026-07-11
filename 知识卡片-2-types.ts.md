@@ -19,10 +19,11 @@
 |------|------|
 | 1 | import（`EditorPosition` 类型） |
 | 3–4 | import from `./i18n`（type: `LangSetting`, `Translations`；value: `SUPPORTED_LANGS`, `TRANSLATIONS`） |
-| 接口 | ColorOption / TextColorSettings（含 `language`）/ ResolvedTarget |
+| 接口 | ColorOption / TextColorSettings（含 `language`、`activeSettingsTab`）/ ResolvedTarget |
+| 类型 | SettingsTabId（设置页 Tab 标识符字面量联合类型） |
 | 常量 | DEFAULT_FONT_SIZES、DEFAULT_COLOR_DEFS、DEFAULT_SETTINGS |
 | 工厂函数 | getDefaultColors()、colorsAreBuiltinDefaults() |
-| 正则常量 | WRAPPER_RE、OPEN_TAG_RE、CLOSE_TAG_RE、SPAN_IN_LINE_RE |
+| 正则常量 | WRAPPER_RE、OPEN_TAG_RE、CLOSE_TAG_RE、SPAN_IN_LINE_RE、SPAN_IN_BLOCK_RE |
 | 工具函数 | unwrap()、stripColorSpans()、escapeAttr()、wrap()、createColorTitle()、Bold/FontSize 相关 |
 
 ---
@@ -54,13 +55,24 @@ interface FontSizeOption {
 
 ```typescript
 interface TextColorSettings {
-    language: LangSetting;   // 'auto' | 'en' | 'zh'——界面语言设置
+    language: LangSetting;          // 'auto' | 'en' | 'zh'——界面语言设置
     colors: ColorOption[];
     fontSizes: FontSizeOption[];
+    activeSettingsTab: SettingsTabId; // 上次打开的设置页 Tab，跨会话保留
 }
 ```
 
 插件的持久化数据结构，存储在 vault 的 `.obsidian/plugins/text-brush/data.json` 中。
+
+> `activeSettingsTab` 记住用户上次在设置页查看的 Tab，重新打开时自动恢复。老用户 data.json 无此字段时，`loadSettings()` 的默认值合并会兜底为 `'general'`，向后兼容。
+
+### SettingsTabId
+
+```typescript
+type SettingsTabId = 'general' | 'colors' | 'fonts';
+```
+
+设置页 Tab 的合法标识符。与 `settingTab.ts` 中的 `TAB_IDS` 数组对应——新增 Tab 时需同时扩展此类型和 `TAB_IDS`。
 
 ### ResolvedTarget
 
@@ -133,10 +145,10 @@ function colorsAreBuiltinDefaults(colors: ColorOption[]): boolean
 ### DEFAULT_SETTINGS
 
 ```typescript
-{ language: 'auto', colors: getDefaultColors(TRANSLATIONS.en), fontSizes: DEFAULT_FONT_SIZES }
+{ language: 'auto', colors: getDefaultColors(TRANSLATIONS.en), fontSizes: DEFAULT_FONT_SIZES, activeSettingsTab: 'general' }
 ```
 
-`loadSettings()` 加载时与 data.json 合并的兜底值。默认 `language: 'auto'`（跟随 Obsidian）；`colors` 以英文名初始化占位，`loadSettings()` 随后会在无用户数据时按解析后的实际语言用 `getDefaultColors(this.t)` 覆盖。
+`loadSettings()` 加载时与 data.json 合并的兜底值。默认 `language: 'auto'`（跟随 Obsidian）；`colors` 以英文名初始化占位，`loadSettings()` 随后会在无用户数据时按解析后的实际语言用 `getDefaultColors(this.t)` 覆盖；`activeSettingsTab: 'general'` 作为首次打开设置页的默认 Tab。
 
 ---
 
@@ -182,6 +194,16 @@ function colorsAreBuiltinDefaults(colors: ColorOption[]): boolean
 - 带 `g` 标志（配合 `exec` 循环逐个遍历）
 
 **配合使用场景：** 用户在已着色文本中双击选中部分文字时，OPEN_TAG_RE/CLOSE_TAG_RE 无法匹配（标签不紧邻选区），改用 SPAN_IN_LINE_RE 扫描整行找到包含选区的 span。
+
+### SPAN_IN_BLOCK_RE
+
+```regex
+/<span class="tc-color tc-color--([\w-]+)"(?:\s+style="[^"]*")?>([\s\S]*?)<\/span>/g
+```
+
+形状与 `SPAN_IN_LINE_RE` 完全相同（非锚定、非贪婪、带 `g` 标志），但语义上用于扫描**可能跨多行的文本块**——在 `main.ts` 的 `expandToOverlappingSpan()` 中，把选区覆盖的若干行拼成一个 `block`，用此正则遍历其中所有 span，判断选区是否与某个 span 部分重叠。
+
+> 保留两份独立常量而非复用同一个，是为了让单行扫描和块扫描的语义各自清晰——它们共享相同的匹配模式，但 `lastIndex` 状态独立，避免在 `resolveTarget` 不同分支间互相干扰。
 
 ---
 

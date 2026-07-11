@@ -31,3 +31,59 @@
     vertical-align: middle;
     border: 1px solid var(--background-modifier-border);
 }
+
+/* ── Settings tab navigation ── */
+.tb-settings-tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--background-modifier-border);
+    margin-bottom: 16px;
+}
+
+.tb-settings-tab {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: var(--font-ui-small);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+    margin-bottom: -1px;
+}
+
+.tb-settings-tab:hover {
+    color: var(--text-normal);
+}
+
+.tb-settings-tab--active {
+    color: var(--text-normal);
+    border-bottom-color: var(--interactive-accent);
+}
+
+.tb-settings-tab-content {
+    display: none;
+}
+
+.tb-settings-tab-content--active {
+    display: block;
+}
+
+/* Remove separator lines between setting items inside tabs */
+.tb-settings .setting-item {
+    border-top: none;
+}
+
+/* Tab section headings (via setHeading()) */
+.tb-settings .setting-item-heading {
+    padding-top: 18px;
+    margin-top: 12px;
+    border-top: 1px solid var(--background-modifier-border);
+}
+
+.tb-settings .setting-item-heading:first-child {
+    padding-top: 0;
+    margin-top: 0;
+    border-top: none;
+}
